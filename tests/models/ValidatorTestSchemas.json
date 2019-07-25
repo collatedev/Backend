@@ -1,0 +1,257 @@
+{
+    "schemas": [
+        {
+            "types": {
+				"request": {
+				}
+            }
+        },
+        {
+            "types": {
+				"request": {
+					"body": {
+						"type": "body",
+						"required": true
+					}
+				},
+                "body": {
+                    "foo": {
+                        "type": "number",
+                        "required": true
+                    }
+                }
+            }
+        },
+        {
+            "types": {
+				"request": {
+					"body": {
+						"type": "body",
+						"required": true
+					}
+				},
+                "body": {
+                    "foo": {
+                        "type": "number",
+                        "required": true
+                    }
+                }
+            }
+        },
+        {
+            "types": {
+				"request": {
+					"body": {
+						"type": "body",
+						"required": true
+					}
+				},
+                "body": {
+                    "foo": {
+                        "type": "number",
+                        "required": false
+                    }
+                }
+            }
+        },
+        {
+            "types": {
+				"request": {
+					"body": {
+						"type": "body",
+						"required": true
+					}
+				},
+                "body": {
+                    "bar": {
+                        "type": "string",
+                        "required": true
+                    }
+                }
+            }
+        },
+        {
+            "types": {
+				"request": {
+					"body": {
+						"type": "body",
+						"required": true
+					}
+				},
+                "body": {
+                    "bar": {
+                        "type": "boolean",
+                        "required": true
+                    }
+                }
+            }
+        },
+        {
+            "types": {
+				"request": {
+					"body": {
+						"type": "body",
+						"required": true
+					}
+				},
+                "body": {
+                    "bar": {
+                        "type": "enum",
+                        "values": ["A", "B"],
+                        "required": true
+                    }
+                }
+            }
+        },
+        {
+            "types": {
+				"request": {
+					"body": {
+						"type": "body",
+						"required": true
+					}
+				},
+                "body": {
+                    "bar": {
+                        "type": "array[string]",
+                        "required": true
+                    }
+                }
+            }
+        },
+        {
+            "types": {
+				"request": {
+					"body": {
+						"type": "body",
+						"required": true
+					}
+				},
+                "body": {
+                    "foo": {
+                        "type": "bar",
+                        "required": true
+                    }
+                },
+                "bar": {
+                    "baz": {
+                        "type": "number",
+                        "required": true
+                    }
+                }
+            }
+        },
+        {
+            "types": {
+				"request": {
+					"body": {
+						"type": "body",
+						"required": true
+					}
+				},
+                "body": {
+                    "bar": {
+                        "type": "array[array[string]]",
+                        "required": true
+                    }
+                }
+            }
+        },
+        {
+            "types": {
+				"request": {
+					"body": {
+						"type": "body",
+						"required": true
+					}
+				},
+                "body": {
+                    "bar": {
+                        "type": "array[array[enum]]",
+                        "values": ["A", "B"],
+                        "required": true
+                    }
+                }
+            }
+        },
+        {
+            "types": {
+				"request": {
+					"body": {
+						"type": "body",
+						"required": true
+					}
+				},
+                "body": {
+                    "bar": {
+                        "type": "array[array[foo]]",
+                        "required": true
+                    }
+                },
+                "foo": {
+                    "baz": {
+                        "type": "number",
+                        "required": true
+                    }
+                }
+            }
+        },
+        {
+            "types": {
+				"request": {
+					"body": {
+						"type": "body",
+						"required": true
+					}
+				},
+                "body": {
+                    "bar": {
+                        "type": "array[array[foo]]",
+                        "required": true
+                    }
+                },
+                "foo": {
+                    "baz": {
+                        "type": "qux",
+                        "required": true
+                    }
+                },
+                "qux": {
+                    "quux": {
+                        "type": "number",
+                        "required": true
+                    }
+                }
+            }
+		},
+		{
+            "types": {
+				"request": {
+					"body": {
+						"type": "body",
+						"required": true
+					}
+				},
+				"body": {
+					"foo": {
+						"type": "number",
+						"required": true
+					}
+				}
+            }
+		},
+		{
+			"types": {
+				"request": {
+					"body": {
+						"type": "number",
+						"required": true
+					}
+				}
+			}
+        },
+        {
+            "types": {}
+        }
+    ]
+}

@@ -1,0 +1,63 @@
+{
+    "types": {
+        "request": {
+            "body": {
+                "type": "body",
+                "required": true
+            }
+        },
+        "body": {
+            "data": {
+                "required": true,
+                "type": "array[StreamData]"
+            }
+        },
+        "StreamData": {
+            "id": {
+                "type": "number",
+                "required": true
+            },
+            "user_id": {
+                "type": "number",
+                "required": true
+            },
+            "user_name": {
+                "type": "number",
+                "required": true
+            },
+            "game_id": {
+                "type": "number",
+                "required": true
+            },
+            "community_ids": {
+                "type": "array[number]",
+                "required": true
+            },
+            "type": {
+                "type": "string",
+                "required": true
+            },
+            "title": {
+                "type": "string",
+                "required": true
+            },
+            "viewer_count": {
+                "type": "number",
+                "required": true
+            },
+            "started_at": {
+                "type": "string",
+                "required": true
+            },
+            "language": {
+                "type": "string",
+                "required": true
+            },
+            "thumbnail_url": {
+                "type": "string",
+                "required": true,
+                "isURL": true
+            }
+        }
+    }
+}

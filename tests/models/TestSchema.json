@@ -1,0 +1,49 @@
+{
+    "types": {
+        "body": {
+            "hub.mode": {
+                "required": true,
+                "type": "enum",
+                "values": [
+                    "subscribe", 
+                    "unsubscribe"
+                ]
+            },
+            "hub.lease_seconds": {
+                "required": true,
+                "type": "number",
+                "range": [0, 864000]
+            },
+            "hub.callback": {
+                "required": true,
+                "type": "string",
+                "isURL": true
+            },
+            "hub.topic": {
+                "required": true,
+                "type": "string",
+                "isURL": true,
+                "startsWith": "https://api.twitch.tv/helix/"
+            },
+            "hub.secret": {
+                "required": true,
+                "type": "string",
+                "length": 16
+            },
+            "foo": {
+                "required": true,
+                "type": "bar"
+            },
+            "qux": {
+                "required": true,
+                "type": "array[string]"
+            }
+        },
+        "bar": {
+            "baz": {
+                "required": false,
+                "type": "number"
+            }
+        }
+    }
+}

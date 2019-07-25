@@ -1,10 +1,10 @@
-import * as Express from "express";
-import * as BodyParser from "body-parser";
-import * as morgan from "morgan";
-import { ILogger } from "@collate/logging";
+import Express from "express";
+import BodyParser from "body-parser";
+import morgan from "morgan";
 import IApp from "./IApp";
-import { IRouter } from "@collate/router";
-import IService from "../../Service/src/Service/IService";
+import ILogger from "../Logging/ILogger";
+import IService from "../Service/IService";
+import IRouter from "../Router/IRouter";
 
 export default class App implements IApp {
     public app: Express.Application;

@@ -1,0 +1,38 @@
+{
+    "types": {
+        "request": {
+            "body": {
+                "type": "body",
+                "required": true
+            }
+        },
+        "body": {
+            "data": {
+                "required": true,
+                "type": "array[TwitchProfileUpdate]"
+            }
+        },
+        "TwitchProfileUpdate": {
+            "from_id": {
+                "type": "number",
+                "required": true
+            },
+            "from_name": {
+                "type": "string",
+                "required": true
+            },
+            "to_id": {
+                "type": "number",
+                "required": true
+            },
+            "to_name": {
+                "type": "string",
+                "required": true
+            },
+            "followed_at": {
+                "type": "string",
+                "required": true
+            }
+        }
+    }
+}

@@ -4,8 +4,8 @@
 	"description": "collate backend",
 	"main": "./dist/index.js",
 	"scripts": {
-		"start": "npm run lint && tsc -p . && node bin/index.js",
-		"build": "npm run lint && tsc -p .",
+		"start": "npm run build && node bin/index.js",
+		"build": "npm run lint && tsc -p ./tsconfig.prod.json",
 		"test": "jest",
 		"lint": "tslint src/**/*.ts && tslint tests/**/*.ts"
 	},
@@ -28,13 +28,20 @@
 		"tslint-config-standard": "^8.0.1"
 	},
 	"dependencies": {
+		"@types/dotenv": "^6.1.1",
 		"@types/express": "^4.17.0",
+		"@types/logform": "^1.2.0",
 		"@types/morgan": "^1.7.36",
 		"@types/node": "^11.9.5",
+		"@types/node-fetch": "^2.5.0",
+		"dotenv": "^8.0.0",
 		"express": "^4.17.1",
+		"logform": "^2.1.2",
 		"morgan": "^1.9.1",
+		"node-fetch": "^2.6.0",
 		"nodemon": "^1.18.10",
 		"ts-node": "^8.0.2",
-		"typescript": "^3.3.3333"
+		"typescript": "^3.3.3333",
+		"winston": "^3.2.1"
 	}
 }

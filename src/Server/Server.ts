@@ -1,6 +1,7 @@
 import App from "./App";
 import * as Dotenv from "dotenv";
-import { ILogger, Logger } from "@collate/logging";
+import ILogger from "../Logging/ILogger";
+import Logger from "../Logging/Logger";
 
 const PortIndex : number = 2;
 

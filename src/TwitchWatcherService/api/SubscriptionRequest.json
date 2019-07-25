@@ -1,0 +1,16 @@
+{
+    "types": {
+        "request": {
+            "body": {
+                "required": true,
+                "type": "Body"
+            }
+        },
+        "Body": {
+            "userID": {
+                "type": "number",
+                "required": true
+            }
+        }
+    }
+}

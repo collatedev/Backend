@@ -1,0 +1,16 @@
+{
+    "types": {
+        "request": {
+            "query": {
+                "type": "Query",
+                "required": true
+            }
+        },
+        "Query": {
+            "a": {
+                "type": "boolean",
+                "required": true
+            }         
+        }
+    }
+}

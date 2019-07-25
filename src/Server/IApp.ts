@@ -1,4 +1,4 @@
-import IService from "../../Service/src/Service/IService";
+import IService from "../Service/IService";
 
 export default interface IApp {
     initialize() : void;

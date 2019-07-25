@@ -1,0 +1,31 @@
+{
+    "types": {
+        "request": {
+            "query": {
+                "required": true,
+                "type": "Query"
+            }
+        },
+        "Query": {
+            "hub.topic": {
+                "type": "string",
+                "required": true,
+                "isURL": true
+            },
+            "hub.lease_seconds": {
+                "type": "number",
+                "required": true,
+                "range": [0, 864000]
+            },
+            "hub.mode": {
+                "type": "enum",
+                "required": true,
+                "values": ["subscribe", "unsubscribe"]
+            },
+            "hub.challenge": {
+                "type": "string",
+                "required": true
+            }
+        }
+    }
+}

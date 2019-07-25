@@ -1,0 +1,30 @@
+{
+    "types": {
+        "request": {
+            "access_token": {
+                "type": "string",
+                "required": false
+            },
+	        "refresh_token": {
+                "type": "any",
+                "required": false
+            },
+	        "scope": {
+                "type": "string",
+                "required": false
+            },
+	        "error": {
+                "type": "string",
+                "required": false
+            },
+	        "status": {
+                "type": "number",
+                "required": false
+            },
+	        "message": {
+                "type": "string",
+                "required": false
+            }
+        }
+    }
+}
