@@ -2,9 +2,9 @@
 	"name": "collate-backend",
 	"version": "1.0.0",
 	"description": "collate backend",
-	"main": "./dist/index.js",
+	"main": "./dist/Server/Server.js",
 	"scripts": {
-		"start": "npm run build && node bin/index.js",
+		"start": "npm run build && node dist/Server/Server.js 8080",
 		"build": "npm run lint && tsc -p ./tsconfig.prod.json",
 		"test": "jest",
 		"lint": "tslint src/**/*.ts && tslint tests/**/*.ts"

@@ -2,6 +2,7 @@ import App from "./App";
 import * as Dotenv from "dotenv";
 import ILogger from "../Logging/ILogger";
 import Logger from "../Logging/Logger";
+import TwitchWatcherService from "../TwitchWatcherService/TwitchWatcherService";
 
 const PortIndex : number = 2;
 
@@ -9,6 +10,7 @@ function main() : void {
 	Dotenv.config();
 	const logger : ILogger = getLogger();
 	const app : App = new App(logger);
+	app.registerService(new TwitchWatcherService(logger));
 	app.initialize();
 
 	const port : number = parseInt(process.argv[PortIndex], 10);
