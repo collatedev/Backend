@@ -1,22 +1,22 @@
 import mockResponse from '../../mocks/MockResponse';
 import mockRequest from '../../mocks/MockRequest';
-import SubscriptionRouter from '../../../src/TwitchWatcherService/routes/SubscriptionRouter';
+import SubscriptionRouter from '../../../src/TwitchWatcher/routes/SubscriptionRouter';
 import MockUserLayer from '../../mocks/MockUserLayer';
 import MockUserModel from '../../mocks/MockUserModel';
 import MockLogger from '../../mocks/MockLogger';
 import ILogger from '../../../src/Logging/ILogger';
 import StatusCodes from '../../../src/Router/StatusCodes';
-import ErrorMessage from '../../../src/TwitchWatcherService/messages/ErrorMessage';
+import ErrorMessage from '../../../src/TwitchWatcher/messages/ErrorMessage';
 import IRouteHandler from '../../../src/Router/IRouteHandler';
 import ValidationSchema from '../../../src/RequestValidator/ValidationSchema/ValidationSchema';
-import TwitchUser from '../../../src/TwitchWatcherService/schemas/user/TwitchUser';
-import SubscriptonSchema from '../../../src/TwitchWatcherService/api/SubscriptionRequest.json';
-import DataMessage from '../../../src/TwitchWatcherService/messages/DataMessage';
+import TwitchUser from '../../../src/TwitchWatcher/schemas/user/TwitchUser';
+import SubscriptonSchema from '../../../src/TwitchWatcher/api/SubscriptionRequest.json';
+import DataMessage from '../../../src/TwitchWatcher/messages/DataMessage';
 
 const logger : ILogger = new MockLogger();
 
 describe("validate() [middleware]", () => {
-	test(`Should fail because the body is empty`, async (done : any) => {
+	test(`Should fail because the body is empty`, async () => {
         const router : SubscriptionRouter = new SubscriptionRouter(
             new MockUserLayer(new MockUserModel()), 
             logger
@@ -26,21 +26,19 @@ describe("validate() [middleware]", () => {
         const response : any = mockResponse();
 	
 		const middleWare : IRouteHandler = router.validate(new ValidationSchema(SubscriptonSchema));
-		middleWare(request, response, () => {
-			expect(response.status).toHaveBeenCalledWith(StatusCodes.BadRequest);
-			expect(response.json).toHaveBeenCalledWith(
-				new ErrorMessage([
-					{
-						location: "",
-						message: "Missing property 'body'",
-					}
-				])
-			);
-			done();
-		});
+        middleWare(request, response);
+        expect(response.status).toHaveBeenCalledWith(StatusCodes.BadRequest);
+        expect(response.json).toHaveBeenCalledWith(
+            new ErrorMessage([
+                {
+                    location: "",
+                    message: "Missing property 'body'",
+                }
+            ])
+        );
     });
     
-    test(`Should fail because the body does not contain a user ID`, async (done : any) => {
+    test(`Should fail because the body does not contain a user ID`, async () => {
         const router : SubscriptionRouter = new SubscriptionRouter(
             new MockUserLayer(new MockUserModel()),
             logger
@@ -54,22 +52,20 @@ describe("validate() [middleware]", () => {
         const response : any = mockResponse();
 
         const middleWare : IRouteHandler = router.validate(new ValidationSchema(SubscriptonSchema));
-		middleWare(request, response, () => {
-			expect(response.status).toHaveBeenCalledWith(StatusCodes.BadRequest);
-			expect(response.json).toHaveBeenCalledWith(
-				new ErrorMessage([
-					{
-						location: "body",
-						message: "Missing property 'userID'",
-                    },
-                    {
-						location: "body",
-						message: "Unexpected property 'foo'",
-					}
-				])
-			);
-			done();
-		});
+        middleWare(request, response);
+        expect(response.status).toHaveBeenCalledWith(StatusCodes.BadRequest);
+        expect(response.json).toHaveBeenCalledWith(
+            new ErrorMessage([
+                {
+                    location: "body",
+                    message: "Missing property 'userID'",
+                },
+                {
+                    location: "body",
+                    message: "Unexpected property 'foo'",
+                }
+            ])
+        );
     });
 });
 

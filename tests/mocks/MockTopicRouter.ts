@@ -2,7 +2,7 @@ import MockBody from "./MockBody";
 import MockLogger from "./MockLogger";
 import ILogger from "../../src/Logging/ILogger";
 import IValidationSchema from "../../src/RequestValidator/ValidationSchema/IValidationSchema";
-import TopicRouter from "../../src/TwitchWatcherService/routes/TopicRouter";
+import TopicRouter from "../../src/TwitchWatcher/routes/TopicRouter";
 
 const logger : ILogger = new MockLogger();
 

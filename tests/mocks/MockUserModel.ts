@@ -1,5 +1,5 @@
-import TwitchUser from "../../src/TwitchWatcherService/schemas/user/TwitchUser";
-import IUserModel from "../../src/TwitchWatcherService/models/IUserModel";
+import TwitchUser from "../../src/TwitchWatcher/schemas/user/TwitchUser";
+import IUserModel from "../../src/TwitchWatcher/models/IUserModel";
 
 export default class MockUserModel implements IUserModel {
     private db : { [key: number]: TwitchUser; };

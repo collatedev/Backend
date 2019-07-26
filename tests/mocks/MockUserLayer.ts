@@ -1,9 +1,9 @@
-import IUserLayer from "../../src/TwitchWatcherService/layers/IUserLayer";
-import IUserModel from "../../src/TwitchWatcherService/models/IUserModel";
+import IUserLayer from "../../src/TwitchWatcher/layers/IUserLayer";
+import IUserModel from "../../src/TwitchWatcher/models/IUserModel";
 import MockUserModel from "./MockUserModel";
-import TwitchUser from "../../src/TwitchWatcherService/schemas/user/TwitchUser";
-import SubscriptionBody from "../../src/TwitchWatcherService/schemas/request/SubscriptionBody";
-import UnsubscriptionBody from "../../src/TwitchWatcherService/schemas/request/UnsubscriptionBody";
+import TwitchUser from "../../src/TwitchWatcher/schemas/user/TwitchUser";
+import SubscriptionBody from "../../src/TwitchWatcher/schemas/request/SubscriptionBody";
+import UnsubscriptionBody from "../../src/TwitchWatcher/schemas/request/UnsubscriptionBody";
 
 export default class MockUserLayer implements IUserLayer {
     private userModel : IUserModel;

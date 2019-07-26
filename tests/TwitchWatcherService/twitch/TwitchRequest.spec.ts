@@ -1,13 +1,13 @@
 import MockSecretGenerator from "../../mocks/MockSecretGenerator";
 import { Response, Headers } from "node-fetch";
-import ITwitchSubscription from "../../../src/TwitchWatcherService/twitch/ITwitchSubscription";
-import TwitchSubscription from "../../../src/TwitchWatcherService/twitch/TwitchSubscription";
-import SubscriptionBody from "../../../src/TwitchWatcherService/schemas/request/SubscriptionBody";
-import TwitchWebhookRequestBody from "../../../src/TwitchWatcherService/twitch/TwitchWebhookRequestBody";
+import ITwitchSubscription from "../../../src/TwitchWatcher/twitch/ITwitchSubscription";
+import TwitchSubscription from "../../../src/TwitchWatcher/twitch/TwitchSubscription";
+import SubscriptionBody from "../../../src/TwitchWatcher/schemas/request/SubscriptionBody";
+import TwitchWebhookRequestBody from "../../../src/TwitchWatcher/twitch/TwitchWebhookRequestBody";
 import MockTwitchRequest from "../../mocks/MockTwitchRequest";
-import ITwitchRequest from "../../../src/TwitchWatcherService/twitch/ITwitchRequest";
+import ITwitchRequest from "../../../src/TwitchWatcher/twitch/ITwitchRequest";
 import MockFetchRequestBuilder from "../../mocks/MockFetchRequestBuilder";
-import TwitchResponse from "../../../src/TwitchWatcherService/twitch/TwitchResponse";
+import TwitchResponse from "../../../src/TwitchWatcher/twitch/TwitchResponse";
 
 describe('send()', () => {
 	test('Should fail to get OAuth token for the request', async () => {

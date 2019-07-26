@@ -1,6 +1,6 @@
-import TwitchWebhookRequestBody from "../../../src/TwitchWatcherService/twitch/TwitchWebhookRequestBody";
-import TwitchSubscription from "../../../src/TwitchWatcherService/twitch/TwitchSubscription";
-import ITwitchWebhookRequestBody from "../../../src/TwitchWatcherService/twitch/ITwitchWebhookRequestBody";
+import TwitchWebhookRequestBody from "../../../src/TwitchWatcher/twitch/TwitchWebhookRequestBody";
+import TwitchSubscription from "../../../src/TwitchWatcher/twitch/TwitchSubscription";
+import ITwitchWebhookRequestBody from "../../../src/TwitchWatcher/twitch/ITwitchWebhookRequestBody";
 import MockSecretGenerator from "../../mocks/MockSecretGenerator";
 
 describe("TwitchRequestBody", () => {

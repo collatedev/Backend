@@ -2,7 +2,7 @@ import App from "./App";
 import * as Dotenv from "dotenv";
 import ILogger from "../Logging/ILogger";
 import Logger from "../Logging/Logger";
-import TwitchWatcherService from "../TwitchWatcherService/TwitchWatcherService";
+import TwitchWatcherService from "../TwitchWatcher/TwitchWatcherService";
 
 const PortIndex : number = 2;
 

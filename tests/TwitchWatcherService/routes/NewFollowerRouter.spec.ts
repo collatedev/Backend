@@ -1,6 +1,6 @@
 import mockResponse from '../../mocks/MockResponse';
 import mockRequest from '../../mocks/MockRequest';
-import ChallengeQueryRequestSchema from '../../../src/TwitchWatcherService/api/WebhookChallengeRequest.json';
+import ChallengeQueryRequestSchema from '../../../src/TwitchWatcher/api/WebhookChallengeRequest.json';
 import IValidationSchema from '../../../src/RequestValidator/ValidationSchema/IValidationSchema';
 import ValidationSchema from '../../../src/RequestValidator/ValidationSchema/ValidationSchema';
 import ILogger from '../../../src/Logging/ILogger';
@@ -8,7 +8,7 @@ import MockLogger from '../../mocks/MockLogger';
 import IRouteHandler from '../../../src/Router/IRouteHandler';
 import StatusCodes from '../../../src/Router/StatusCodes';
 import ErrorMessage from '../../../src/Router/Messages/ErrorMessage';
-import NewFollowerRouter from '../../../src/TwitchWatcherService/routes/NewFollowerRouter';
+import NewFollowerRouter from '../../../src/TwitchWatcher/routes/NewFollowerRouter';
 
 const ChallengeSchema : IValidationSchema = new ValidationSchema(ChallengeQueryRequestSchema);
 
@@ -18,7 +18,7 @@ const Router : NewFollowerRouter = new NewFollowerRouter(logger);
 Router.setup();
 
 describe("validate() [middleware]", () => {
-	test('Should fail to handle challenge', (done : any) => {
+	test('Should fail to handle challenge', () => {
 		const request : any = mockRequest({
 			query: {
 				"hub.lease_seconds": 500,
@@ -29,18 +29,16 @@ describe("validate() [middleware]", () => {
 		const response : any = mockResponse();
 	
 		const middleWare : IRouteHandler = Router.validate(ChallengeSchema);
-		middleWare(request, response, () => {
-			expect(response.status).toHaveBeenCalledWith(StatusCodes.BadRequest);
-			expect(response.json).toHaveBeenCalledWith(
-				new ErrorMessage([
-					{
-						location: "query",
-						message: "Missing property 'hub.topic'",
-					}
-				])
-			);
-			done();
-		});
+		middleWare(request, response);
+		expect(response.status).toHaveBeenCalledWith(StatusCodes.BadRequest);
+		expect(response.json).toHaveBeenCalledWith(
+			new ErrorMessage([
+				{
+					location: "query",
+					message: "Missing property 'hub.topic'",
+				}
+			])
+		);
 	});
 });
 

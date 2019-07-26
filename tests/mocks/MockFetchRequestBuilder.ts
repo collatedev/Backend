@@ -1,5 +1,5 @@
 import { RequestInit, Response } from "node-fetch";
-import IRequestBuilder from "../../src/TwitchWatcherService/request_builder/IRequestBuilder";
+import IRequestBuilder from "../../src/TwitchWatcher/request_builder/IRequestBuilder";
 
 type RequestResolver = (response: Response | undefined) => void;
 type RequestRejector = (error: Error) => void;

@@ -8,67 +8,52 @@
             "body": {
                 "type": "body",
                 "required": true
-            },
-            "query": {
-                "type": "any",
-                "required": false
             }
         },
         "body": {
             "data": {
                 "required": true,
-                "type": "array[StreamData]"
+                "type": "array[UserFollowData]"
             }
         },
-        "StreamData": {
+        "UserFollowData": {
             "id": {
                 "type": "number",
                 "required": true
             },
-            "user_id": {
-                "type": "number",
-                "required": true
-            },
-            "user_name": {
+            "login": {
                 "type": "string",
                 "required": true
             },
-            "game_id": {
-                "type": "number",
+            "display_name": {
+                "type": "string",
                 "required": true
-            },
-            "tags_ids": {
-                "type": "any",
-                "required": false
-            },
-            "community_ids": {
-                "type": "array[number]",
-                "required": false
             },
             "type": {
-                "type": "string",
-                "required": true
-            },
-            "title": {
-                "type": "string",
-                "required": true
-            },
-            "viewer_count": {
                 "type": "number",
                 "required": true
             },
-            "started_at": {
+            "broadcaster_type": {
                 "type": "string",
                 "required": true
             },
-            "language": {
+            "description": {
                 "type": "string",
                 "required": true
             },
-            "thumbnail_url": {
+            "profile_image_url": {
                 "type": "string",
                 "required": true,
                 "isURL": true
+            },
+            "offline_image_url": {
+                "type": "string",
+                "required": true,
+                "isURL": true
+            },
+            "view_count": {
+                "type": "number",
+                "required": true
             }
         }
     }

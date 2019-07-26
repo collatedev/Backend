@@ -3,9 +3,9 @@ import StatusCodes from '../../../src/Router/StatusCodes';
 import MockFetchRequestBuilder from '../../mocks/MockFetchRequestBuilder';
 import MockSecretGenerator from '../../mocks/MockSecretGenerator';
 import MockLogger from '../../mocks/MockLogger';
-import ITwitchService from '../../../src/TwitchWatcherService/twitch/ITwitchService';
-import TwitchService from '../../../src/TwitchWatcherService/twitch/TwitchService';
-import SubscriptionBody from '../../../src/TwitchWatcherService/schemas/request/SubscriptionBody';
+import ITwitchService from '../../../src/TwitchWatcher/twitch/ITwitchService';
+import TwitchService from '../../../src/TwitchWatcher/twitch/TwitchService';
+import SubscriptionBody from '../../../src/TwitchWatcher/schemas/request/SubscriptionBody';
 
 const WebhookCount : number = 4;
 
@@ -55,7 +55,7 @@ describe('subscribe', () => {
 		)).rejects.toEqual(new Error(
 			`Failed to subscribe to {"hub.mode":"subscribe","hub.topic":"https://api.twitch.tv/` +
 			`helix/users/follows?first=1&to_id=123","hub.secret":"secret","hub.callba` +
-			`ck":"endpoint_url/follow/new","hub.lease_seconds":864000}`
+			`ck":"endpoint_url/follow/new","hub.lease_seconds":300}`
 		));
 	});
 

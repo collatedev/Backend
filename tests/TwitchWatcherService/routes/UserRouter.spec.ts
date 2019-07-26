@@ -1,6 +1,6 @@
 import mockResponse from '../../mocks/MockResponse';
 import mockRequest from '../../mocks/MockRequest';
-import UserRouter from '../../../src/TwitchWatcherService/routes/UserRouter';
+import UserRouter from '../../../src/TwitchWatcher/routes/UserRouter';
 import MockUserLayer from '../../mocks/MockUserLayer';
 import ILogger from '../../../src/Logging/ILogger';
 import MockLogger from '../../mocks/MockLogger';
@@ -8,13 +8,13 @@ import MockUserModel from '../../mocks/MockUserModel';
 import IRouteHandler from '../../../src/Router/IRouteHandler';
 import StatusCodes from '../../../src/Router/StatusCodes';
 import ErrorMessage from '../../../src/Router/Messages/ErrorMessage';
-import IUserLayer from '../../../src/TwitchWatcherService/layers/IUserLayer';
-import DataMessage from '../../../src/TwitchWatcherService/messages/DataMessage';
+import IUserLayer from '../../../src/TwitchWatcher/layers/IUserLayer';
+import DataMessage from '../../../src/TwitchWatcher/messages/DataMessage';
 
 const logger : ILogger = new MockLogger();
 
 describe("validate() [middleware]", () => {
-	test('Should fail to validate due to incorrect type', (done : any) => {
+	test('Should fail to validate due to incorrect type', () => {
         const router : UserRouter = new UserRouter(new MockUserLayer(new MockUserModel()), logger);
         router.setup();
 		const request : any = mockRequest({
@@ -25,18 +25,16 @@ describe("validate() [middleware]", () => {
 		const response : any = mockResponse();
 	
 		const middleWare : IRouteHandler = router.validate(router.getSchema());
-		middleWare(request, response, () => {
-			expect(response.status).toHaveBeenCalledWith(StatusCodes.BadRequest);
-			expect(response.json).toHaveBeenCalledWith(
-				new ErrorMessage([
-					{
-						location: "params.userID",
-						message: "Property 'userID' should be type 'number'",
-					}
-				])
-			);
-			done();
-		});
+        middleWare(request, response);
+        expect(response.status).toHaveBeenCalledWith(StatusCodes.BadRequest);
+        expect(response.json).toHaveBeenCalledWith(
+            new ErrorMessage([
+                {
+                    location: "params.userID",
+                    message: "Property 'userID' should be type 'number'",
+                }
+            ])
+        );
     });
     
     test('Should fail due to a float userID [TODO]', async () => {

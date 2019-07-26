@@ -1,8 +1,8 @@
 import FakeSecretGenerator from "./MockSecretGenerator";
-import TwitchRequest from "../../src/TwitchWatcherService/twitch/TwitchRequest";
-import ITwitchSubscription from "../../src/TwitchWatcherService/twitch/ITwitchSubscription";
-import IRequestBuilder from "../../src/TwitchWatcherService/request_builder/IRequestBuilder";
-import TwitchWebhookRequestBody from "../../src/TwitchWatcherService/twitch/TwitchWebhookRequestBody";
+import TwitchRequest from "../../src/TwitchWatcher/twitch/TwitchRequest";
+import ITwitchSubscription from "../../src/TwitchWatcher/twitch/ITwitchSubscription";
+import IRequestBuilder from "../../src/TwitchWatcher/request_builder/IRequestBuilder";
+import TwitchWebhookRequestBody from "../../src/TwitchWatcher/twitch/TwitchWebhookRequestBody";
 
 export default class MockTwitchRequest extends TwitchRequest {
 	constructor(subscription: ITwitchSubscription, requestBuilder: IRequestBuilder) {
