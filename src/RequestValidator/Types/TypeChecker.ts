@@ -56,8 +56,8 @@ export default class TypeChecker implements ITypeChecker {
     private typeCheckField(fieldName : string, value : any, configuration : IFieldConfiguration) : void {
         if (IsType.isAnyType(configuration.type)) {
             return;
-        } else if (IsType.isPrimative(configuration.type) && !IsType.isTypeOf(configuration.type, value)) {
-            this.errorHandler.handleError([fieldName, configuration.type], ErrorType.IncorrectType);
+        } else if (IsType.isPrimative(configuration.type)) {
+            this.typeCheckPrimative(fieldName, value, configuration);
         } else if (IsType.isEnum(configuration.type) && !IsType.isTypeOf("string", value)) {
             this.errorHandler.handleError([fieldName, configuration.type], ErrorType.IncorrectType);
         }  else if (IsType.isArray(configuration.type)) {
@@ -67,6 +67,37 @@ export default class TypeChecker implements ITypeChecker {
         } else if (this.isUnknownType(configuration.type)) {
             this.errorHandler.handleError([fieldName, configuration.type], ErrorType.IncorrectType);
         }
+    }
+
+    private typeCheckPrimative(fieldName : string, value : any, configuration : IFieldConfiguration) : void {
+        switch (configuration.type) {
+            case "string":
+                if (!IsType.isTypeOf(configuration.type, value)) {
+                    this.errorHandler.handleError([fieldName, configuration.type], ErrorType.IncorrectType);
+                }
+                break;
+            case "boolean":
+                if (!IsType.isTypeOf(configuration.type, value) && !this.isBooleanString(value)) {
+                    this.errorHandler.handleError([fieldName, configuration.type], ErrorType.IncorrectType);
+                }
+                break;
+            case "number":
+                if (!IsType.isTypeOf(configuration.type, value) && !this.isNumberString(value)) {
+                    this.errorHandler.handleError([fieldName, configuration.type], ErrorType.IncorrectType);
+                }
+                break;
+        }
+    }
+
+    private isBooleanString(value : any) : boolean {
+        return IsType.isTypeOf("string", value) && (
+            (value as string).toLowerCase() === "true" ||
+            (value as string).toLowerCase() === "false"
+        );
+    }
+
+    private isNumberString(value : any) : boolean {
+        return IsType.isTypeOf("string", value) && !isNaN(parseInt(value, 10));
     }
 
     private typeCheckNestedObject(fieldName : string, value : any, configuration : IFieldConfiguration) : void {

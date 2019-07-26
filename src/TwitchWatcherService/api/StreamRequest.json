@@ -1,9 +1,17 @@
 {
     "types": {
         "request": {
+            "headers" : {
+                "required": false,
+                "type": "any"
+            },
             "body": {
                 "type": "body",
                 "required": true
+            },
+            "query": {
+                "type": "any",
+                "required": false
             }
         },
         "body": {
@@ -22,16 +30,20 @@
                 "required": true
             },
             "user_name": {
-                "type": "number",
+                "type": "string",
                 "required": true
             },
             "game_id": {
                 "type": "number",
                 "required": true
             },
+            "tags_ids": {
+                "type": "any",
+                "required": false
+            },
             "community_ids": {
                 "type": "array[number]",
-                "required": true
+                "required": false
             },
             "type": {
                 "type": "string",

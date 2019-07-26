@@ -1,5 +1,5 @@
 import Express from "express";
-import BodyParser from "body-parser";
+import * as BodyParser from "body-parser";
 import morgan from "morgan";
 import IApp from "./IApp";
 import ILogger from "../Logging/ILogger";

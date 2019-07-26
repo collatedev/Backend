@@ -113,6 +113,38 @@ test("That the value is a boolean", () => {
     expectValidResult(validationResult);
 });
 
+test("That the value is a boolean", () => {
+    const typeChecker : ITypeChecker = new TypeChecker(new PathBuilder(), EmptySchema);
+    const typeConfiguration : ITypeConfiguration = new TypeConfiguration({
+        foo: {
+            type: "boolean",
+            required: true
+        }
+    });
+
+    const validationResult : IValidationResult = typeChecker.typeCheck({
+        foo: "True"
+    }, typeConfiguration);
+
+    expectValidResult(validationResult);
+});
+
+test("That the value is a boolean", () => {
+    const typeChecker : ITypeChecker = new TypeChecker(new PathBuilder(), EmptySchema);
+    const typeConfiguration : ITypeConfiguration = new TypeConfiguration({
+        foo: {
+            type: "boolean",
+            required: true
+        }
+    });
+
+    const validationResult : IValidationResult = typeChecker.typeCheck({
+        foo: "faLse"
+    }, typeConfiguration);
+
+    expectValidResult(validationResult);
+});
+
 test("That the type is not a boolean", () => {
     const typeChecker : ITypeChecker = new TypeChecker(new PathBuilder(), EmptySchema);
     const typeConfiguration : ITypeConfiguration = new TypeConfiguration({
@@ -131,6 +163,23 @@ test("That the type is not a boolean", () => {
         "foo",
         "Property 'foo' should be type 'boolean'"
     );
+});
+
+test("That the value is a number", () => {
+    const typeChecker : ITypeChecker = new TypeChecker(new PathBuilder(), EmptySchema);
+
+    const typeConfiguration : ITypeConfiguration = new TypeConfiguration({
+        foo: {
+            type: "number",
+            required: true
+        }
+    });
+
+    const validationResult : IValidationResult = typeChecker.typeCheck({
+        foo: "1"
+    }, typeConfiguration);
+
+    expectValidResult(validationResult);
 });
 
 test("That the value is a number", () => {

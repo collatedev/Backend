@@ -7,7 +7,7 @@ import IAuthorizedTopic from "./IAuthorizedTopic";
 import ITwitchSubscription from "./ITwitchSubscription";
 
 const SecretSize : number = 16;
-const LeaseSeconds : number = 864000; // 10 days in seconds
+const LeaseSeconds : number = 300; // 5 minutes in seconds | 864000 days in seconds
 
 export default class TwitchWebhookRequestBody implements ITwitchWebhookRequestBody, ITwitchRequestBody {
 	public "hub.mode": string;
@@ -52,7 +52,7 @@ export default class TwitchWebhookRequestBody implements ITwitchWebhookRequestBo
 		return this.authorizedTopic.isAuthorized();
 	}
 
-	public getScope() : string {
+	public getScope() : string[] {
 		return this.authorizedTopic.scope();
 	}
 

@@ -30,6 +30,7 @@ export default class UserLayer implements IUserLayer {
 
     public async unsubscribe(unsubscriptionBody: UnsubscriptionBody): Promise<TwitchUser> {
         const user : TwitchUser = await this.userModel.getByID(unsubscriptionBody.userID);
+        await this.twitch.unsubscribe(unsubscriptionBody);
         return user;
     }
 }

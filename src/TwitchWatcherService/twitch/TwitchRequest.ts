@@ -16,19 +16,19 @@ import Validatable from "../../RequestValidator/Request/Validatable";
 type TwitchResolver = (response: ITwitchResponse) => void;
 type TwitchRejector = (error: Error) => void;
 
+const TokenValidationSchema : IValidationSchema = new ValidationSchema(TwitchOAuthBearerSchema);
+
 export default abstract class TwitchRequest implements ITwitchRequest {
 	private readonly SubscriptionEndpoint : string = "https://api.twitch.tv/helix/webhooks/hub";
 	
 	private requestBuilder : IRequestBuilder;
 	private body: ITwitchRequestBody;
 	private tokenValidator : IValidator;
-	private tokenValidationSchema : IValidationSchema;
 
 	constructor(body: ITwitchRequestBody, requestBuilder: IRequestBuilder) {
 		this.requestBuilder = requestBuilder;
 		this.body = body;
 		this.tokenValidator = new Validator();
-		this.tokenValidationSchema = new ValidationSchema(TwitchOAuthBearerSchema);
 		this.buildRequest = this.buildRequest.bind(this);
 	}
 
@@ -97,7 +97,10 @@ export default abstract class TwitchRequest implements ITwitchRequest {
 		);
 		const json : any = await response.json();
 		const bearer : TwitchOAuthBearer = new TwitchOAuthBearer(json);
-		const result : IValidationResult = this.tokenValidator.validate(new Validatable(json), this.tokenValidationSchema);
+		const result : IValidationResult = this.tokenValidator.validate(
+			new Validatable(json), 
+			TokenValidationSchema
+		);
 
 		if (result.isValid()) {
 			if (bearer.error) {

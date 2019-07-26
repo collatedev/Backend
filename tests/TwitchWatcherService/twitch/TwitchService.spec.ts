@@ -90,6 +90,6 @@ function getAuthorizationBearer(): string {
 	return JSON.stringify({
 		access_token: "asdfasdf",
 		refresh_token: "eyJfMzUtNDU0OC04MWYwLTQ5MDY5ODY4NGNlMSJ9%asdfasdf=",
-		scope: "user_read_email"
+		scope: ["user_read_email"]
 	});
 }

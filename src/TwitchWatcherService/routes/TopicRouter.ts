@@ -28,12 +28,18 @@ export default abstract class TopicRouter extends Router implements ITopicRouter
     }
 
     public async handleChallenge(request: Request, response: Response) : Promise<void> {
-        response.send(new ChallengeQuery(request.query)["hub.challenge"]).status(StatusCodes.OK);
+		const spacing : number = 4;
+		this.logger.info(`body: ${JSON.stringify(request.body, null, spacing)}`);
+		this.logger.info(`query: ${JSON.stringify(request.query, null, spacing)}`);
+		response.status(StatusCodes.OK).send(new ChallengeQuery(request.query)["hub.challenge"]);
 	}
     
     public async handleWebhookCall(request: Request, response: Response) : Promise<void> {
         try {
 			await this.handleWebhookData(request.body);
+			const spacing : number = 4;
+			this.logger.info(`body: ${JSON.stringify(request.body, null, spacing)}`);
+			this.logger.info(`query: ${JSON.stringify(request.query, null, spacing)}`);
 			this.logger.info(`Successfuly processed webhook at topic: '${this.topic}'`);
 			this.sendData(response, {
 				desc: `Recieved data under topic: ${this.topic}`,

@@ -111,7 +111,6 @@ test("Sanitizes a string that is a url", () => {
 
 test("Sanitizes a number with outside of the range", () => {
     const sanitizer : ISanitizer = new Sanitizer(new PathBuilder(), EmptyValidationSchema);
-    const value : number = 2;
     const configuration : ITypeConfiguration = new TypeConfiguration({
         foo: {
             type: "number",
@@ -122,7 +121,7 @@ test("Sanitizes a number with outside of the range", () => {
 
     assertResultHasError(
         sanitizer.sanitize({
-            foo: value
+            foo: "2"
         }, configuration), 
         "foo", 
         "Value '2' is outside of the range [0, 1]"

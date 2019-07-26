@@ -9,8 +9,16 @@
                 "type": "any",
                 "required": false
             },
-	        "scope": {
+            "expires_in": {
+                "type": "number",
+                "required": false
+            },
+            "token_type": {
                 "type": "string",
+                "required": false
+            },
+	        "scope": {
+                "type": "array[string]",
                 "required": false
             },
 	        "error": {

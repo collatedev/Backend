@@ -4,7 +4,7 @@ const AuthorizedTopics: { [id: string]: string[] } = {
     "user": ["user:read:email"]
 };
 
-const EmptyScope : string = "";
+const EmptyScope : string[] = [];
 
 export default class AuthorizedTopic implements IAuthorizedTopic {
     private topic : string;
@@ -17,11 +17,11 @@ export default class AuthorizedTopic implements IAuthorizedTopic {
         return AuthorizedTopics.hasOwnProperty(this.topic);
     }
 
-    public scope() : string {
+    public scope() : string[] {
         if (!this.isAuthorized()) {
             return EmptyScope;
         } else {
-            return AuthorizedTopics[this.topic].join(" ").trim();
+            return AuthorizedTopics[this.topic];
         }
     }
 }

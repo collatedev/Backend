@@ -10,8 +10,9 @@ function main() : void {
 	Dotenv.config();
 	const logger : ILogger = getLogger();
 	const app : App = new App(logger);
-	app.registerService(new TwitchWatcherService(logger));
 	app.initialize();
+
+	app.registerService(new TwitchWatcherService(logger));
 
 	const port : number = parseInt(process.argv[PortIndex], 10);
 	app.start(port);

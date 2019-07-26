@@ -42,7 +42,17 @@ export default class RequestBuilder implements IRequestBuilder {
         return this;
     }
 
-    public build(): IRequest {
-        return new Request(this.body, this.cookies, this.headers, this.params, this.query);
+    public build() : IRequest {
+        const request : IRequest = new Request(this.body, this.cookies, this.headers, this.params, this.query);
+        this.reset();
+        return request;
+    }
+
+    public reset() : void {
+        this.body = null;
+        this.cookies = null;
+        this.headers = null;
+        this.params = null;
+        this.query = null;
     }
 }

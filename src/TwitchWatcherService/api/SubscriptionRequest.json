@@ -1,6 +1,10 @@
 {
     "types": {
         "request": {
+            "headers": {
+                "required": false,
+                "type": "any"
+            },
             "body": {
                 "required": true,
                 "type": "Body"

@@ -59,9 +59,10 @@ export default class Validator implements IValidator {
 	private typeCheckAndSanitizeRequest(request : IRequest) : void {
 		const rootConfiguration : ITypeConfiguration = this.schema.getTypeConfiguration(RootType);
 		for (const field of rootConfiguration.getFields()) {
-			if (this.schema.hasType(field)) {
+			const fieldConfiguration : IFieldConfiguration = rootConfiguration.getConfiguration(field);
+			if (this.schema.hasType(fieldConfiguration.type) && request.getRequest().has(field)) {
 				const value : any = request.getRequest().value(field);
-				const configuration : ITypeConfiguration = this.schema.getTypeConfiguration(field);
+				const configuration : ITypeConfiguration = this.schema.getTypeConfiguration(fieldConfiguration.type);
 				this.pathBuilder.addPathComponent(new PropertyPathComponent(field));
 				this.result.join(this.typeChecker.typeCheck(value, configuration));
 				this.result.join(this.sanitizer.sanitize(value, configuration));

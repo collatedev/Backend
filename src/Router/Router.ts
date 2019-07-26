@@ -12,6 +12,7 @@ import IValidationResult from "../RequestValidator/ValidationResult/IValidationR
 import RequestBuilder from "../RequestValidator/Request/RequestBuilder";
 import IValidator from "../RequestValidator/IValidator";
 import Validator from "../RequestValidator/Validator";
+import IRequest from "../RequestValidator/Request/IRequest";
 
 const RouteValidator : IValidator = new Validator();
 
@@ -64,7 +65,7 @@ export default abstract class Router implements IRouter {
             response : Express.Response, 
             next? : Express.NextFunction
         ) : void => {
-            const requestSchema : IValidationSchema = schema;
+            const requestSchema : IValidationSchema =   schema;
 
             if (!this.isEmpty(request.body)) {
                 this.requestBuilder.setBody(request.body);
@@ -82,9 +83,17 @@ export default abstract class Router implements IRouter {
                 this.requestBuilder.setQuery(request.query);
             } 
 
-            const result : IValidationResult = RouteValidator.validate(this.requestBuilder.build(), requestSchema);
-            if (!result.isValid()) {
-                this.sendError(response, result.errors(), StatusCodes.BadRequest);
+            const validationRequest : IRequest = this.requestBuilder.build();
+            // this.requestBuilder.reset();
+
+            try {
+                const result : IValidationResult = RouteValidator.validate(validationRequest, requestSchema);
+                if (!result.isValid()) {
+                    this.requestBuilder.reset();
+                    return this.sendError(response, result.errors(), StatusCodes.BadRequest);
+                }
+            } catch (error) {
+                return this.sendError(response, error, StatusCodes.BadRequest);
             }
             if (next) {
                 return next();
@@ -104,14 +113,14 @@ export default abstract class Router implements IRouter {
 
     protected sendError(response: Express.Response, error: any, status: number) : void {
         response
-            .json(new ErrorMessage(error))
-            .status(status);
+            .status(status)
+            .json(new ErrorMessage(error));
     }
 
     protected sendData(response: Express.Response, data: any, status: number) : void {
         response
-            .json(new DataMessage(data))
-            .status(status);
+            .status(status)
+            .json(new DataMessage(data));
     }
     
     public abstract setup() : void;

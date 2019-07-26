@@ -7,4 +7,5 @@ export default interface IRequestBuilder {
     setParams(params : any) : IRequestBuilder;
     setQuery(query : any) : IRequestBuilder;
     build() : IRequest;
+    reset() : void;
 }

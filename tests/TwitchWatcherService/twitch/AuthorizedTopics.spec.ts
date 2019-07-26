@@ -18,12 +18,12 @@ describe('scope', () => {
     test('unauthorized topic has no scope', () => {
         const topic : AuthorizedTopic = new AuthorizedTopic("foo");
 
-        expect(topic.scope()).toEqual("");
+        expect(topic.scope()).toEqual([]);
     });
 
     test('authorized topic has a scope', () => {
         const topic : AuthorizedTopic = new AuthorizedTopic("user");
 
-        expect(topic.scope()).toEqual("user:read:email");
+        expect(topic.scope()).toEqual(["user:read:email"]);
     });
 });

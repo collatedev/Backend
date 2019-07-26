@@ -1,6 +1,10 @@
 {
     "types": {
         "request": {
+            "headers" : {
+                "required": false,
+                "type": "any"
+            },
             "query": {
                 "required": true,
                 "type": "Query"
@@ -14,8 +18,7 @@
             },
             "hub.lease_seconds": {
                 "type": "number",
-                "required": true,
-                "range": [0, 864000]
+                "required": false
             },
             "hub.mode": {
                 "type": "enum",

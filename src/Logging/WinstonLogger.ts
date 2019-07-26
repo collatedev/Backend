@@ -14,6 +14,7 @@ const options : any = {
 			filename: path.resolve(
 				__dirname, 
 				'..',
+				'..',
 				'logs',
 				fileName
 			),
