@@ -2,7 +2,7 @@ import MockTopicRouter from "../../mocks/MockTopicRouter";
 import MockBody from "../../mocks/MockBody";
 import mockResponse from '../../mocks/MockResponse';
 import mockRequest from '../../mocks/MockRequest';
-import ChallengeQueryRequestSchema from '../../../src/TwitchWatcher/RequestSchemas/WebhookChallengeRequest.json';
+import ChallengeQueryRequestSchema from '../../../src/RequestSchemas/WebhookChallengeRequest.json';
 import TopicTestRequestSchema from '../RequestSchema/TestTopic.json';
 import IValidationSchema from "../../../src/RequestValidator/ValidationSchema/IValidationSchema";
 import ValidationSchema from "../../../src/RequestValidator/ValidationSchema/ValidationSchema";

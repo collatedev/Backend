@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import ChallengeQuery from "../RequestBody/request/ChallengeQuery";
-import WebhookChallengeRequestSchema from "../RequestSchemas/WebhookChallengeRequest.json";
+import WebhookChallengeRequestSchema from "../../RequestSchemas/WebhookChallengeRequest.json";
 import ITopicRouter from "./ITopicRouter";
 import IValidationSchema from "../../RequestValidator/ValidationSchema/IValidationSchema";
 import ILogger from "../../Logging/ILogger";

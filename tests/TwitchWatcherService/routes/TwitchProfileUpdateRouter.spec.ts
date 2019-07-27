@@ -1,6 +1,6 @@
 import mockResponse from '../../mocks/MockResponse';
 import mockRequest from '../../mocks/MockRequest';
-import ChallengeQueryRequestSchema from '../../../src/TwitchWatcher/RequestSchemas/WebhookChallengeRequest.json';
+import ChallengeQueryRequestSchema from '../../../src/RequestSchemas/WebhookChallengeRequest.json';
 import IValidationSchema from '../../../src/RequestValidator/ValidationSchema/IValidationSchema';
 import ValidationSchema from '../../../src/RequestValidator/ValidationSchema/ValidationSchema';
 import ILogger from '../../../src/Logging/ILogger';
