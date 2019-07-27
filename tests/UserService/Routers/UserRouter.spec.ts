@@ -1,6 +1,6 @@
 import mockResponse from '../../mocks/MockResponse';
 import mockRequest from '../../mocks/MockRequest';
-import UserRouter from '../../../src/TwitchWatcher/routes/UserRouter';
+import UserRouter from '../../../src/UserService/Routes/UserRouter';
 import MockUserLayer from '../../mocks/MockUserLayer';
 import ILogger from '../../../src/Logging/ILogger';
 import MockLogger from '../../mocks/MockLogger';
@@ -8,8 +8,11 @@ import MockUserModel from '../../mocks/MockUserModel';
 import IRouteHandler from '../../../src/Router/IRouteHandler';
 import StatusCodes from '../../../src/Router/StatusCodes';
 import ErrorMessage from '../../../src/Router/Messages/ErrorMessage';
-import IUserLayer from '../../../src/TwitchWatcher/layers/IUserLayer';
-import DataMessage from '../../../src/TwitchWatcher/messages/DataMessage';
+import IUserLayer from '../../../src/UserService/layers/IUserLayer';
+import DataMessage from '../../../src/Router/Messages/DataMessage';
+import GetUserRequestSchema from '../../../src/UserService/RequestSchemas/GetUserRequest.json';
+import ValidationSchema from '../../../src/RequestValidator/ValidationSchema/ValidationSchema';
+import NewUserData from '../../../src/UserService/Layers/NewUserData';
 
 const logger : ILogger = new MockLogger();
 
@@ -24,7 +27,7 @@ describe("validate() [middleware]", () => {
         });
 		const response : any = mockResponse();
 	
-		const middleWare : IRouteHandler = router.validate(router.getSchema());
+		const middleWare : IRouteHandler = router.validate(new ValidationSchema(GetUserRequestSchema));
         middleWare(request, response);
         expect(response.status).toHaveBeenCalledWith(StatusCodes.BadRequest);
         expect(response.json).toHaveBeenCalledWith(
@@ -68,17 +71,20 @@ describe('handleGetUserByID()', () => {
         router.setup();
         const request : any = mockRequest({
             params: {
-                userID: 1
+                userID: 0
             }
         });
         const response : any = mockResponse();
-        twitchModel.addUser(1);
+        await userLayer.createUser(new NewUserData({
+            twitchUserID: 1,
+            youtubeChannelID: "foo"
+        }));
 
         await router.handleGetUserByID(request, response);
 
         expect(response.status).toHaveBeenCalledWith(StatusCodes.OK);
         expect(response.json).toHaveBeenCalledWith(
-            new DataMessage(await twitchModel.getByID(1))
+            new DataMessage(await twitchModel.getByID(0))
         );
     });
 });

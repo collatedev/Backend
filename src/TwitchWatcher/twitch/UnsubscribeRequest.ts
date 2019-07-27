@@ -1,6 +1,6 @@
 import TwitchRequest from "./TwitchRequest";
 import TwitchWebhookRequestBody from "./TwitchWebhookRequestBody";
-import IRequestBuilder from "../request_builder/IRequestBuilder";
+import IRequestBuilder from "../RequestBuilder/IRequestBuilder";
 import ISecretGenerator from "./ISecretGenerator";
 import ITwitchSubscription from "./ITwitchSubscription";
 

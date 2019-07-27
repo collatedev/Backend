@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import ChallengeQuery from "../schemas/request/ChallengeQuery";
-import WebhookChallengeRequestSchema from "../api/WebhookChallengeRequest.json";
+import ChallengeQuery from "../RequestBody/request/ChallengeQuery";
+import WebhookChallengeRequestSchema from "../RequestSchemas/WebhookChallengeRequest.json";
 import ITopicRouter from "./ITopicRouter";
 import IValidationSchema from "../../RequestValidator/ValidationSchema/IValidationSchema";
 import ILogger from "../../Logging/ILogger";
@@ -14,7 +14,7 @@ export default abstract class TopicRouter extends Router implements ITopicRouter
 	private readonly challengeSchema : IValidationSchema;
 
     constructor(topic: string, schema : IValidationSchema, logger : ILogger) {
-		super(`/topic`, logger);
+		super(`/twitch/topic`, logger);
 		this.schema = schema;
 		this.challengeSchema = new ValidationSchema(WebhookChallengeRequestSchema);
         this.topic = topic;
@@ -28,18 +28,12 @@ export default abstract class TopicRouter extends Router implements ITopicRouter
     }
 
     public async handleChallenge(request: Request, response: Response) : Promise<void> {
-		const spacing : number = 4;
-		this.logger.info(`body: ${JSON.stringify(request.body, null, spacing)}`);
-		this.logger.info(`query: ${JSON.stringify(request.query, null, spacing)}`);
 		response.status(StatusCodes.OK).send(new ChallengeQuery(request.query)["hub.challenge"]);
 	}
     
     public async handleWebhookCall(request: Request, response: Response) : Promise<void> {
         try {
 			await this.handleWebhookData(request.body);
-			const spacing : number = 4;
-			this.logger.info(`body: ${JSON.stringify(request.body, null, spacing)}`);
-			this.logger.info(`query: ${JSON.stringify(request.query, null, spacing)}`);
 			this.logger.info(`Successfuly processed webhook at topic: '${this.topic}'`);
 			this.sendData(response, {
 				desc: `Recieved data under topic: ${this.topic}`,

@@ -1,21 +1,16 @@
 import MockSecretGenerator from "../../mocks/MockSecretGenerator";
 import { Response, Headers } from "node-fetch";
-import ITwitchSubscription from "../../../src/TwitchWatcher/twitch/ITwitchSubscription";
-import TwitchSubscription from "../../../src/TwitchWatcher/twitch/TwitchSubscription";
-import SubscriptionBody from "../../../src/TwitchWatcher/schemas/request/SubscriptionBody";
-import TwitchWebhookRequestBody from "../../../src/TwitchWatcher/twitch/TwitchWebhookRequestBody";
+import ITwitchSubscription from "../../../src/TwitchWatcher/Twitch/ITwitchSubscription";
+import TwitchSubscription from "../../../src/TwitchWatcher/Twitch/TwitchSubscription";
+import TwitchWebhookRequestBody from "../../../src/TwitchWatcher/Twitch/TwitchWebhookRequestBody";
 import MockTwitchRequest from "../../mocks/MockTwitchRequest";
-import ITwitchRequest from "../../../src/TwitchWatcher/twitch/ITwitchRequest";
+import ITwitchRequest from "../../../src/TwitchWatcher/Twitch/ITwitchRequest";
 import MockFetchRequestBuilder from "../../mocks/MockFetchRequestBuilder";
-import TwitchResponse from "../../../src/TwitchWatcher/twitch/TwitchResponse";
+import TwitchResponse from "../../../src/TwitchWatcher/Twitch/TwitchResponse";
 
 describe('send()', () => {
 	test('Should fail to get OAuth token for the request', async () => {
-		const body : SubscriptionBody = new SubscriptionBody({
-			callbackURL: "",
-			userID: 1
-		});
-		const subscription : ITwitchSubscription = new TwitchSubscription(body, "user", "foo");
+		const subscription : ITwitchSubscription = new TwitchSubscription(1, "user", "foo");
 		const builder : MockFetchRequestBuilder = new MockFetchRequestBuilder();
 		const request : ITwitchRequest = new MockTwitchRequest(subscription, builder);
 		
@@ -23,11 +18,7 @@ describe('send()', () => {
 	});
 
 	test('Should fail to get OAuth token for the request due to error with request', async () => {
-		const body : SubscriptionBody = new SubscriptionBody({
-			callbackURL: "",
-			userID: 1
-		});
-		const subscription : ITwitchSubscription = new TwitchSubscription(body, "user", "foo");
+		const subscription : ITwitchSubscription = new TwitchSubscription(1, "user", "foo");
 		const builder : MockFetchRequestBuilder = new MockFetchRequestBuilder();
 		const request : ITwitchRequest = new MockTwitchRequest(subscription, builder);
 
@@ -43,12 +34,7 @@ describe('send()', () => {
 	});
 
 	test('Should successfully send authorized request', async () => {
-		const body : SubscriptionBody = new SubscriptionBody({
-			callbackURL: "",
-			userID: 1
-		});
-
-		const subscription : ITwitchSubscription = new TwitchSubscription(body, "user", "foo");
+		const subscription : ITwitchSubscription = new TwitchSubscription(1, "user", "foo");
 		const builder : MockFetchRequestBuilder = new MockFetchRequestBuilder();
 		const request : ITwitchRequest = new MockTwitchRequest(subscription, builder);
 
@@ -72,11 +58,7 @@ describe('send()', () => {
 	});
 
 	test('Should successfully send unauthorized request', async () => {
-		const body : SubscriptionBody  = new SubscriptionBody({
-			callbackURL: "",
-			userID: 1
-		});
-		const subscription : ITwitchSubscription = new TwitchSubscription(body, "streams", "foo");
+		const subscription : ITwitchSubscription = new TwitchSubscription(1, "streams", "foo");
 		const builder : MockFetchRequestBuilder = new MockFetchRequestBuilder();
 		const request : ITwitchRequest = new MockTwitchRequest(subscription, builder);
 

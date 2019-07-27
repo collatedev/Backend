@@ -1,8 +1,8 @@
 import SubscribeRequest from './SubscribeRequest';
 import UnsubscribeRequest from './UnsubscribeRequest';
 import TwitchSubscription from './TwitchSubscription';
-import FetchRequestBuilder from '../request_builder/FetchRequestBuilder';
-import IRequestBuilder from "../request_builder/IRequestBuilder";
+import FetchRequestBuilder from '../RequestBuilder/FetchRequestBuilder';
+import IRequestBuilder from "../RequestBuilder/IRequestBuilder";
 import TwitchTopics from "./TwitchTopics";
 import TwitchCallbackURL from "./TwitchCallbackURL";
 import ISecretGenerator from "./ISecretGenerator";
@@ -11,9 +11,6 @@ import ITwitchResponse from "./ITwitchResponse";
 import ITwitchService from "./ITwitchService";
 import ILogger from "../../Logging/ILogger";
 import StatusCodes from "../../Router/StatusCodes";
-import ITwitchBody from "../schemas/request/ITwitchBody";
-import SubscriptionBody from '../schemas/request/SubscriptionBody';
-import UnsubscriptionBody from '../schemas/request/UnsubscriptionBody';
 
 type PendingTwitchResponse = Promise<ITwitchResponse>;
 
@@ -28,37 +25,37 @@ export default class TwitchService implements ITwitchService {
 		this.secretGenerator = secretGenerator;
 	}
 
-	public async subscribe(body: SubscriptionBody) : Promise<void> {
+	public async subscribe(userID : number) : Promise<void> {
 		try {
 			const callbackURL : string = await TwitchCallbackURL.getCallbackURL();
-			const requests : SubscribeRequest[] = this.getSubscribeRequests(body, callbackURL);
+			const requests : SubscribeRequest[] = this.getSubscribeRequests(userID, callbackURL);
 			await this.makeRequests(requests);
 			this.logger.info(
-				`Successfully completed Twich subscription requests to all topics for user (id=${body.userID}) to all webhooks`
+				`Successfully completed Twich subscription requests to all topics for user (id=${userID}) to all webhooks`
 			);	
 		} catch (error) {
 			throw error;
 		}
 	}
 
-	public async unsubscribe(body: UnsubscriptionBody) : Promise<void> {
+	public async unsubscribe(userID: number) : Promise<void> {
 		try {
 			const callbackURL : string = await TwitchCallbackURL.getCallbackURL();
-			const requests : UnsubscribeRequest[] = this.getUnsubscribeRequests(body, callbackURL);
+			const requests : UnsubscribeRequest[] = this.getUnsubscribeRequests(userID, callbackURL);
 			await this.makeRequests(requests);
 			this.logger.info(
-				`Successfully completed Twich subscription requests to all topics for user (id=${body.userID}) to all webhooks`
+				`Successfully completed Twich subscription requests to all topics for user (id=${userID}) to all webhooks`
 			);	
 		} catch (error) {
 			throw error;
 		}
 	}
 
-	private getSubscribeRequests(body: ITwitchBody, callbackURL: string) : SubscribeRequest[] {
+	private getSubscribeRequests(userID: number, callbackURL: string) : SubscribeRequest[] {
 		const requests : SubscribeRequest[] = [];
 		for (const topic of TwitchTopics) {
 			requests.push(new SubscribeRequest(
-				new TwitchSubscription(body, topic, callbackURL), 
+				new TwitchSubscription(userID, topic, callbackURL), 
 				this.requestBuilder,
 				this.secretGenerator
 			));
@@ -66,11 +63,11 @@ export default class TwitchService implements ITwitchService {
 		return requests;
 	}
 
-	private getUnsubscribeRequests(body: ITwitchBody, callbackURL: string) : SubscribeRequest[] {
+	private getUnsubscribeRequests(userID: number, callbackURL: string) : SubscribeRequest[] {
 		const requests : SubscribeRequest[] = [];
 		for (const topic of TwitchTopics) {
 			requests.push(new UnsubscribeRequest(
-				new TwitchSubscription(body, topic, callbackURL), 
+				new TwitchSubscription(userID, topic, callbackURL), 
 				this.requestBuilder,
 				this.secretGenerator
 			));

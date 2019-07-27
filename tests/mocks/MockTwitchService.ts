@@ -1,5 +1,5 @@
-import ITwitchService from "../../src/TwitchWatcher/twitch/ITwitchService";
-import SubscriptionBody from "../../src/TwitchWatcher/schemas/request/SubscriptionBody";
+import ITwitchService from "../../src/TwitchWatcher/Twitch/ITwitchService";
+import SubscriptionBody from "../../src/TwitchWatcher/RequestBody/request/SubscriptionBody";
 
 export default class MockTwitchService implements ITwitchService {
     public async subscribe(body: SubscriptionBody): Promise<void> {

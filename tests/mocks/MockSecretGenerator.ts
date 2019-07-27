@@ -1,4 +1,4 @@
-import ISecretGenerator from "../../src/TwitchWatcher/twitch/ISecretGenerator";
+import ISecretGenerator from "../../src/TwitchWatcher/Twitch/ISecretGenerator";
 
 export default class MockSecretGenerator implements ISecretGenerator {
 	private secret: string;

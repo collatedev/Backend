@@ -1,4 +1,4 @@
-import FetchRequestBuilder from "../request_builder/FetchRequestBuilder";
+import FetchRequestBuilder from "../TwitchWatcher/RequestBuilder/FetchRequestBuilder";
 import { Response } from "node-fetch";
 import ITunnel from "./ITunnel";
 

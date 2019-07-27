@@ -1,4 +1,3 @@
-import ITwitchBody from "../schemas/request/ITwitchBody";
 import ITwitchSubscription from './ITwitchSubscription';
 
 export default class TwitchSubscription implements ITwitchSubscription {
@@ -7,10 +6,10 @@ export default class TwitchSubscription implements ITwitchSubscription {
 	private _topic: string;
 	private _callbackURL: string;
 
-	constructor(body: ITwitchBody, topic: string, callbackURL: string) {
+	constructor(userID: number, topic: string, callbackURL: string) {
 		this._mode = "";
 		this._topic = topic;
-		this._userID = body.userID;
+		this._userID = userID;
 		this._callbackURL = callbackURL;
 	}
 

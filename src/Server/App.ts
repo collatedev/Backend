@@ -1,25 +1,25 @@
 import Express from "express";
 import * as BodyParser from "body-parser";
+import xmlparser from "express-xml-bodyparser";
 import morgan from "morgan";
 import IApp from "./IApp";
 import ILogger from "../Logging/ILogger";
 import IService from "../Service/IService";
 import IRouter from "../Router/IRouter";
+import PlaygroundRouter from "../YoutubeWatcher/Routes/PlaygroundRouter";
 
-export default class App implements IApp {
+export default abstract class App implements IApp {
     public app: Express.Application;
-    private logger : ILogger;
+    protected logger : ILogger;
 
     constructor(logger : ILogger) {
         this.app = Express();
         this.logger = logger;
-    }
-
-    public initialize() : void {
         this.app.use(BodyParser.json());
         this.app.use(BodyParser.urlencoded({
             extended: false
         }));
+        this.app.use(xmlparser());
         
         const streamOptions : morgan.StreamOptions = {
             write: (message: string): void => {
@@ -27,9 +27,11 @@ export default class App implements IApp {
                 this.logger.info(message);
             },
         };
-
         this.app.use(morgan('combined', { stream: streamOptions }));
+        this.addRouter(new PlaygroundRouter(this.logger));
     }
+
+    public abstract initialize() : void;
 
     public start(port: number) : void {
         this.app.listen(port, () : void => {

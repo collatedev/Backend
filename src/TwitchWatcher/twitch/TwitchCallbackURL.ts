@@ -1,4 +1,4 @@
-import Ngrok from "../developer_tools/Ngrok";
+import Ngrok from "../../DeveloperTools/Ngrok";
 
 export default class TwitchCallbackURL {
     private static localhostCallbackURL: string = "https://localhost:8080/api/v1/topic";
@@ -10,7 +10,7 @@ export default class TwitchCallbackURL {
         } else if (process.env.NODE_ENV === 'test') {
             return "endpoint_url";
         } else {
-            return `${await Ngrok.getURL()}/api/v1/topic`;
+            return `${await Ngrok.getURL()}/api/v1/twitch/topic`;
         }
     }
 }

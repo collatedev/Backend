@@ -3,9 +3,8 @@ import StatusCodes from '../../../src/Router/StatusCodes';
 import MockFetchRequestBuilder from '../../mocks/MockFetchRequestBuilder';
 import MockSecretGenerator from '../../mocks/MockSecretGenerator';
 import MockLogger from '../../mocks/MockLogger';
-import ITwitchService from '../../../src/TwitchWatcher/twitch/ITwitchService';
-import TwitchService from '../../../src/TwitchWatcher/twitch/TwitchService';
-import SubscriptionBody from '../../../src/TwitchWatcher/schemas/request/SubscriptionBody';
+import ITwitchService from '../../../src/TwitchWatcher/Twitch/ITwitchService';
+import TwitchService from '../../../src/TwitchWatcher/Twitch/TwitchService';
 
 const WebhookCount : number = 4;
 
@@ -30,10 +29,7 @@ describe('subscribe', () => {
 
 		const twitch : ITwitchService = new TwitchService(requestBuilder, new MockSecretGenerator("foo"), new MockLogger());
 		
-		await twitch.subscribe(new SubscriptionBody({
-			callbackURL: "",
-			userID: 123
-		}));
+		await twitch.subscribe(1);
 	});
 
 	test('Should fail to send request due to bad request statuses', async () => {
@@ -47,14 +43,9 @@ describe('subscribe', () => {
 			new MockLogger()
 		);
 
-		await expect(twitch.subscribe(
-			new SubscriptionBody({
-				callbackURL: "",
-				userID: 123
-			})
-		)).rejects.toEqual(new Error(
+		await expect(twitch.subscribe(1)).rejects.toEqual(new Error(
 			`Failed to subscribe to {"hub.mode":"subscribe","hub.topic":"https://api.twitch.tv/` +
-			`helix/users/follows?first=1&to_id=123","hub.secret":"secret","hub.callba` +
+			`helix/users/follows?first=1&to_id=1","hub.secret":"secret","hub.callba` +
 			`ck":"endpoint_url/follow/new","hub.lease_seconds":300}`
 		));
 	});
@@ -65,12 +56,7 @@ describe('subscribe', () => {
 		queueBearerResponse(requestBuilder);
 		const twitch : ITwitchService = new TwitchService(requestBuilder, new MockSecretGenerator("foo"), new MockLogger());
 
-		await expect(twitch.subscribe(
-			new SubscriptionBody({
-				callbackURL: "",
-				userID: 123
-			})
-		)).rejects.toEqual(new Error("Request Failed"));
+		await expect(twitch.subscribe(1)).rejects.toEqual(new Error("Request Failed"));
 	});
 });
 

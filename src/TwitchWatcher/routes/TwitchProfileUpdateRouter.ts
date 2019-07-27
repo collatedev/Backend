@@ -1,5 +1,5 @@
 import TopicRouter from "./TopicRouter";
-import TwitchProfileUpdateRequestSchema from "../api/TwitchProfileUpdateRequest.json";
+import TwitchProfileUpdateRequestSchema from "../RequestSchemas/TwitchProfileUpdateRequest.json";
 import ILogger from "../../Logging/ILogger";
 import ValidationSchema from "../../RequestValidator/ValidationSchema/ValidationSchema";
 
