@@ -6,7 +6,6 @@ import IApp from "./IApp";
 import ILogger from "../Logging/ILogger";
 import IService from "../Service/IService";
 import IRouter from "../Router/IRouter";
-import PlaygroundRouter from "../YoutubeWatcher/Routes/PlaygroundRouter";
 
 export default abstract class App implements IApp {
     public app: Express.Application;
@@ -28,7 +27,6 @@ export default abstract class App implements IApp {
             },
         };
         this.app.use(morgan('combined', { stream: streamOptions }));
-        this.addRouter(new PlaygroundRouter(this.logger));
     }
 
     public abstract initialize() : void;
