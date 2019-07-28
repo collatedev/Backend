@@ -3,14 +3,18 @@ import IUserModel from "../models/IUserModel";
 import ITwitchService from "../../TwitchWatcher/Twitch/ITwitchService";
 import IUser from "../models/IUser";
 import INewUserData from "./INewUserData";
+import IYoutube from "../../YoutubeWatcher/Youtube/IYoutube";
+import IYoutubeChannel from "../models/IYoutubeChannel";
 
 export default class UserLayer implements IUserLayer {
     private userModel: IUserModel;
-    private twitch : ITwitchService; 
+    private twitch : ITwitchService;
+    private youtube : IYoutube;
 
-    constructor(userModel: IUserModel, twitch : ITwitchService) {
+    constructor(userModel: IUserModel, twitch : ITwitchService, youtube : IYoutube) {
         this.userModel = userModel;
         this.twitch = twitch;
+        this.youtube = youtube;
     }
 
     public async getUserInfo(id: number) : Promise<IUser> {
@@ -23,7 +27,8 @@ export default class UserLayer implements IUserLayer {
     }
 
     public async subscribe(user : IUser) : Promise<IUser> {
-		await this.twitch.subscribe(user.getTwitchUser().userID());
+        await this.twitch.subscribe(user.getTwitchUser().userID());
+        await this.youtube.subscribeToPushNotifications(user.getYoutubeChannel());
         return user;
 	}
 
@@ -41,8 +46,9 @@ export default class UserLayer implements IUserLayer {
     }
 
     public async createUser(newUserData : INewUserData) : Promise<IUser> {
+        const youtubeChannel : IYoutubeChannel = await this.youtube.getChannel(newUserData.youtubeChannelName);
         try {
-            return await this.userModel.create(newUserData);
+            return await this.userModel.create(newUserData.twitchUserID, youtubeChannel);
         } catch (error) {
             throw error;
         }

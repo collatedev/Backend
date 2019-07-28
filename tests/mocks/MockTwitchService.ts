@@ -1,14 +1,13 @@
 import ITwitchService from "../../src/TwitchWatcher/Twitch/ITwitchService";
-import SubscriptionBody from "../../src/TwitchWatcher/RequestBody/request/SubscriptionBody";
 
 export default class MockTwitchService implements ITwitchService {
-    public async subscribe(body: SubscriptionBody): Promise<void> {
+    public async subscribe(userID: number): Promise<void> {
         return new Promise((resolve : () => void) : void => {
             return resolve();
         });
     }
 
-    public async unsubscribe(body: SubscriptionBody): Promise<void> {
+    public async unsubscribe(userID: number): Promise<void> {
         return new Promise((resolve : () => void) : void => {
             return resolve();
         });

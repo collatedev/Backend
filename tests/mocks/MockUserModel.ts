@@ -1,7 +1,7 @@
 import IUserModel from "../../src/UserService/models/IUserModel";
 import IUser from "../../src/UserService/models/IUser";
-import INewUserData from "../../src/UserService/Layers/INewUserData";
 import User from "../../src/UserService/Models/User";
+import IYoutubeChannel from "../../src/UserService/models/IYoutubeChannel";
 
 export default class MockUserModel implements IUserModel {
     private db : { [key: number]: IUser; };
@@ -20,8 +20,8 @@ export default class MockUserModel implements IUserModel {
 		}
     }
 
-    public async create(newUserData : INewUserData) : Promise<IUser> {
-        this.db[this.id] = new User(newUserData, this.id);
+    public async create(twitchID : number, channel : IYoutubeChannel) : Promise<IUser> {
+        this.db[this.id] = new User(this.id, twitchID, channel);
         const user : IUser = this.db[this.id];
         this.id++;
         return user;

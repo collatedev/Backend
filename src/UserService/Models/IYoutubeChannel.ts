@@ -1,3 +1,4 @@
 export default interface IYoutubeChannel {
-    channelID() : string
+    channelName() : string;
+    getID() : string;
 }

@@ -7,13 +7,15 @@ import TwitchService from "../TwitchWatcher/Twitch/TwitchService";
 import FetchRequestBuilder from "../TwitchWatcher/RequestBuilder/FetchRequestBuilder";
 import SecretGenerator from "../TwitchWatcher/Twitch/SecretGenerator";
 import UserServiceAPI from "./UserServiceAPI";
+import Youtube from "../YoutubeWatcher/Youtube/Youtube";
 
 export default class UserService extends Service {
     constructor(logger : ILogger) {
         super();
         const userLayer : IUserLayer = new UserLayer(
             new UserModel(), 
-            new TwitchService(new FetchRequestBuilder(), new SecretGenerator(), logger)
+            new TwitchService(new FetchRequestBuilder(), new SecretGenerator(), logger),
+            new Youtube(new FetchRequestBuilder())
         );
 
         this.registerAPI(new UserServiceAPI(userLayer, logger));

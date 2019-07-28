@@ -77,7 +77,7 @@ describe('handleGetUserByID()', () => {
         const response : any = mockResponse();
         await userLayer.createUser(new NewUserData({
             twitchUserID: 1,
-            youtubeChannelID: "foo"
+            youtubeChannelName: "foo"
         }));
 
         await router.handleGetUserByID(request, response);

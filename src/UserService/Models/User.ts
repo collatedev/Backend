@@ -2,18 +2,16 @@ import IUser from "./IUser";
 import ITwitchUser from "./ITwitchUser";
 import TwitchUser from "./TwitchUser";
 import IYoutubeChannel from "./IYoutubeChannel";
-import YoutubeChannel from "./YoutubeChannel";
-import INewUserData from "../Layers/INewUserData";
 
 export default class User implements IUser {
     private id : number;
     private twitchUser : ITwitchUser;
     private youtubeChannel : IYoutubeChannel;
 
-    constructor(newUserData : INewUserData, id : number) {
+    constructor(id : number, twitchID : number, channel : IYoutubeChannel) {
         this.id = id;
-        this.twitchUser = new TwitchUser(newUserData.twitchUserID);
-        this.youtubeChannel = new YoutubeChannel(newUserData.youtubeChannelID);
+        this.twitchUser = new TwitchUser(twitchID);
+        this.youtubeChannel = channel;
     }
 
     public getID() : number {

@@ -4,13 +4,13 @@ import TwitchSubscription from './TwitchSubscription';
 import FetchRequestBuilder from '../RequestBuilder/FetchRequestBuilder';
 import IRequestBuilder from "../RequestBuilder/IRequestBuilder";
 import TwitchTopics from "./TwitchTopics";
-import TwitchCallbackURL from "./TwitchCallbackURL";
 import ISecretGenerator from "./ISecretGenerator";
 import ITwitchRequest from "./ITwitchRequest";
 import ITwitchResponse from "./ITwitchResponse";
 import ITwitchService from "./ITwitchService";
 import ILogger from "../../Logging/ILogger";
 import StatusCodes from "../../Router/StatusCodes";
+import WebhookCallbackURL from '../../DeveloperTools/WebhookCallbackURL';
 
 type PendingTwitchResponse = Promise<ITwitchResponse>;
 
@@ -27,7 +27,7 @@ export default class TwitchService implements ITwitchService {
 
 	public async subscribe(userID : number) : Promise<void> {
 		try {
-			const callbackURL : string = await TwitchCallbackURL.getCallbackURL();
+			const callbackURL : string = await WebhookCallbackURL.getCallbackURL("twitch/topic");
 			const requests : SubscribeRequest[] = this.getSubscribeRequests(userID, callbackURL);
 			await this.makeRequests(requests);
 			this.logger.info(
@@ -40,7 +40,7 @@ export default class TwitchService implements ITwitchService {
 
 	public async unsubscribe(userID: number) : Promise<void> {
 		try {
-			const callbackURL : string = await TwitchCallbackURL.getCallbackURL();
+			const callbackURL : string = await WebhookCallbackURL.getCallbackURL("/twitch/topic");
 			const requests : UnsubscribeRequest[] = this.getUnsubscribeRequests(userID, callbackURL);
 			await this.makeRequests(requests);
 			this.logger.info(

@@ -1,4 +1,4 @@
 export default interface INewUserData {
-    youtubeChannelID: string;
+    youtubeChannelName: string;
     twitchUserID : number;
 }
