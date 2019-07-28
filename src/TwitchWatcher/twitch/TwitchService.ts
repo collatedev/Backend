@@ -1,10 +1,7 @@
 import SubscribeRequest from './SubscribeRequest';
 import UnsubscribeRequest from './UnsubscribeRequest';
 import TwitchSubscription from './TwitchSubscription';
-import FetchRequestBuilder from '../RequestBuilder/FetchRequestBuilder';
-import IRequestBuilder from "../RequestBuilder/IRequestBuilder";
 import TwitchTopics from "./TwitchTopics";
-import ISecretGenerator from "./ISecretGenerator";
 import ITwitchRequest from "./ITwitchRequest";
 import ITwitchResponse from "./ITwitchResponse";
 import ITwitchService from "./ITwitchService";
@@ -15,14 +12,10 @@ import WebhookCallbackURL from '../../DeveloperTools/WebhookCallbackURL';
 type PendingTwitchResponse = Promise<ITwitchResponse>;
 
 export default class TwitchService implements ITwitchService {
-	private requestBuilder : IRequestBuilder = new FetchRequestBuilder();
 	private logger : ILogger;
-	private secretGenerator : ISecretGenerator;
 
-	constructor(requestBuilder : IRequestBuilder, secretGenerator : ISecretGenerator, logger : ILogger) {
-		this.requestBuilder = requestBuilder;
+	constructor(logger : ILogger) {
 		this.logger = logger;
-		this.secretGenerator = secretGenerator;
 	}
 
 	public async subscribe(userID : number) : Promise<void> {
@@ -54,11 +47,7 @@ export default class TwitchService implements ITwitchService {
 	private getSubscribeRequests(userID: number, callbackURL: string) : SubscribeRequest[] {
 		const requests : SubscribeRequest[] = [];
 		for (const topic of TwitchTopics) {
-			requests.push(new SubscribeRequest(
-				new TwitchSubscription(userID, topic, callbackURL), 
-				this.requestBuilder,
-				this.secretGenerator
-			));
+			requests.push(new SubscribeRequest(new TwitchSubscription(userID, topic, callbackURL)));
 		}
 		return requests;
 	}
@@ -66,11 +55,7 @@ export default class TwitchService implements ITwitchService {
 	private getUnsubscribeRequests(userID: number, callbackURL: string) : SubscribeRequest[] {
 		const requests : SubscribeRequest[] = [];
 		for (const topic of TwitchTopics) {
-			requests.push(new UnsubscribeRequest(
-				new TwitchSubscription(userID, topic, callbackURL), 
-				this.requestBuilder,
-				this.secretGenerator
-			));
+			requests.push(new UnsubscribeRequest(new TwitchSubscription(userID, topic, callbackURL)));
 		}
 		return requests;
 	}

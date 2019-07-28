@@ -5,6 +5,7 @@ import AuthorizedTopic from "./AuthorizedTopic";
 import ISecretGenerator from "./ISecretGenerator";
 import IAuthorizedTopic from "./IAuthorizedTopic";
 import ITwitchSubscription from "./ITwitchSubscription";
+import SecretGenerator from "./SecretGenerator";
 
 const SecretSize : number = 16;
 const LeaseSeconds : number = 300; // 5 minutes in seconds | 864000 days in seconds
@@ -19,9 +20,9 @@ export default class TwitchWebhookRequestBody implements ITwitchWebhookRequestBo
 	private authorizedTopic : IAuthorizedTopic;
 	private secretGenerator: ISecretGenerator;
 
-	constructor(subscription: ITwitchSubscription, secretGenerator : ISecretGenerator) {
+	constructor(subscription: ITwitchSubscription) {
 		this.authorizedTopic = new AuthorizedTopic(subscription.topic());
-		this.secretGenerator = secretGenerator;
+		this.secretGenerator = new SecretGenerator();
 		this.setupBodyFields(subscription);
 	}
 
