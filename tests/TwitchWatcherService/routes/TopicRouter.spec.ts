@@ -11,6 +11,7 @@ import TopicRouter from "../../../src/TwitchWatcher/Routes/TopicRouter";
 import IRouteHandler from "../../../src/Router/IRouteHandler";
 import ErrorMessage from "../../../src/Router/Messages/ErrorMessage";
 import DataMessage from "../../../src/Router/Messages/DataMessage";
+import validate from "../../../src/Router/Middleware/Validate";
 
 const ChallengeSchema : IValidationSchema = new ValidationSchema(ChallengeQueryRequestSchema);
 const TopicTestSchema : IValidationSchema = new ValidationSchema(TopicTestRequestSchema);
@@ -22,7 +23,7 @@ describe("validate() [middleware]", () => {
         const request : any = mockRequest({});
         const response : any = mockResponse();
 	
-		const middleWare : IRouteHandler = router.validate(ChallengeSchema);
+		const middleWare : IRouteHandler = validate(ChallengeSchema);
 		middleWare(request, response);
 		expect(response.status).toHaveBeenCalledWith(StatusCodes.BadRequest);
 		expect(response.json).toHaveBeenCalledWith(
@@ -47,7 +48,7 @@ describe("validate() [middleware]", () => {
 		});
 		const response : any = mockResponse();
 
-		const middleWare : IRouteHandler = router.validate(ChallengeSchema);
+		const middleWare : IRouteHandler = validate(ChallengeSchema);
 		middleWare(request, response);
 		expect(response.status).toHaveBeenCalledWith(StatusCodes.BadRequest);
 		expect(response.json).toHaveBeenCalledWith(
@@ -72,7 +73,7 @@ describe("validate() [middleware]", () => {
 		});
 		const response : any = mockResponse();
 
-		const middleWare : IRouteHandler = router.validate(ChallengeSchema);
+		const middleWare : IRouteHandler = validate(ChallengeSchema);
 		middleWare(request, response);
 		expect(response.status).toHaveBeenCalledWith(StatusCodes.BadRequest);
 		expect(response.json).toHaveBeenCalledWith(
@@ -97,7 +98,7 @@ describe("validate() [middleware]", () => {
 		});
 		const response : any = mockResponse();
 
-		const middleWare : IRouteHandler = router.validate(ChallengeSchema);
+		const middleWare : IRouteHandler = validate(ChallengeSchema);
 		middleWare(request, response);
 		expect(response.status).toHaveBeenCalledWith(StatusCodes.BadRequest);
 		expect(response.json).toHaveBeenCalledWith(
@@ -122,7 +123,7 @@ describe("validate() [middleware]", () => {
 		});
 		const response : any = mockResponse();
 
-		const middleWare : IRouteHandler = router.validate(TopicTestSchema);
+		const middleWare : IRouteHandler = validate(TopicTestSchema);
 		middleWare(request, response);
 		expect(response.status).toHaveBeenCalledWith(StatusCodes.BadRequest);
 		expect(response.json).toHaveBeenCalledWith(

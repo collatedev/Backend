@@ -8,6 +8,7 @@ import IValidationSchema from "../../../src/RequestValidator/ValidationSchema/IV
 import ValidationSchema from "../../../src/RequestValidator/ValidationSchema/ValidationSchema";
 import WebhookSchema from "../../../src/RequestSchemas/WebhookChallengeRequest.json";
 import ErrorMessage from "../../../src/Router/Messages/ErrorMessage";
+import validate from "../../../src/Router/Middleware/Validate";
 
 const schema : IValidationSchema = new ValidationSchema(WebhookSchema);
 const router : CallbackRouter = new CallbackRouter(new MockLogger());
@@ -31,7 +32,7 @@ describe("handleChallenge", () => {
 		});
         const response : any = MockResponse();
 
-        const middleWare : IRouteHandler = router.validate(schema);
+        const middleWare : IRouteHandler = validate(schema);
         middleWare(request, response);
         expect(response.status).toHaveBeenCalledWith(StatusCodes.BadRequest);
 		expect(response.json).toHaveBeenCalledWith(new ErrorMessage([
@@ -52,7 +53,7 @@ describe("handleChallenge", () => {
 		});
         const response : any = MockResponse();
 
-        const middleWare : IRouteHandler = router.validate(schema);
+        const middleWare : IRouteHandler = validate(schema);
         middleWare(request, response);
         expect(response.status).toHaveBeenCalledWith(StatusCodes.BadRequest);
 		expect(response.json).toHaveBeenCalledWith(new ErrorMessage([
@@ -73,7 +74,7 @@ describe("handleChallenge", () => {
 		});
         const response : any = MockResponse();
 
-        const middleWare : IRouteHandler = router.validate(schema);
+        const middleWare : IRouteHandler = validate(schema);
         middleWare(request, response);
         expect(response.status).toHaveBeenCalledWith(StatusCodes.BadRequest);
 		expect(response.json).toHaveBeenCalledWith(new ErrorMessage([
@@ -96,7 +97,7 @@ describe("handleChallenge", () => {
 		});
         const response : any = MockResponse();
 
-        const middleWare : IRouteHandler = router.validate(schema);
+        const middleWare : IRouteHandler = validate(schema);
         middleWare(request, response);
         expect(response.status).toHaveBeenCalledWith(StatusCodes.BadRequest);
 		expect(response.json).toHaveBeenCalledWith(new ErrorMessage([
@@ -119,7 +120,7 @@ describe("handleChallenge", () => {
 		});
         const response : any = MockResponse();
 
-        const middleWare : IRouteHandler = router.validate(schema);
+        const middleWare : IRouteHandler = validate(schema);
         middleWare(request, response);
         expect(response.status).toHaveBeenCalledWith(StatusCodes.BadRequest);
 		expect(response.json).toHaveBeenCalledWith(new ErrorMessage([

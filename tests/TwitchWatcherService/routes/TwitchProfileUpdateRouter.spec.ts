@@ -9,6 +9,7 @@ import TwitchProfileUpdateRouter from '../../../src/TwitchWatcher/Routes/TwitchP
 import IRouteHandler from '../../../src/Router/IRouteHandler';
 import StatusCodes from '../../../src/Router/StatusCodes';
 import ErrorMessage from '../../../src/Router/Messages/ErrorMessage';
+import validate from '../../../src/Router/Middleware/Validate';
 
 const ChallengeSchema : IValidationSchema = new ValidationSchema(ChallengeQueryRequestSchema);
 
@@ -28,7 +29,7 @@ describe("validate() [middleware]", () => {
 		});
 		const response : any = mockResponse();
 	
-		const middleWare : IRouteHandler = Router.validate(ChallengeSchema);
+		const middleWare : IRouteHandler = validate(ChallengeSchema);
 		middleWare(request, response);
 		expect(response.status).toHaveBeenCalledWith(StatusCodes.BadRequest);
 		expect(response.json).toHaveBeenCalledWith(
