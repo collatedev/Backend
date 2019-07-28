@@ -8,7 +8,7 @@ jest.mock('../../../src/TwitchWatcher/RequestBuilder/FetchRequestBuilder');
 
 describe("send", () => {
     test("It should send a request to the correct url", async () => {
-        FetchRequestBuilder.prototype.makeRequest = jest.fn().mockReturnValue(Promise.resolve(new Response("", {
+        FetchRequestBuilder.prototype.makeRequest = jest.fn().mockReturnValueOnce(Promise.resolve(new Response("", {
             status: 200
         })));
         const request : IYoutubeRequest = new MockYoutubeRequest();

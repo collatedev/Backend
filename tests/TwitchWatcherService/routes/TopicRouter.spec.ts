@@ -1,5 +1,4 @@
 import MockTopicRouter from "../../mocks/MockTopicRouter";
-import MockBody from "../../mocks/MockBody";
 import mockResponse from '../../mocks/MockResponse';
 import mockRequest from '../../mocks/MockRequest';
 import ChallengeQueryRequestSchema from '../../../src/RequestSchemas/WebhookChallengeRequest.json';
@@ -164,6 +163,8 @@ describe('handleChallenge', () => {
 
 describe('handleWebhookCall', () => {
 	test('Should fail to process data', async () => {
+		MockTopicRouter.prototype.handleWebhookData = jest.fn()
+			.mockReturnValueOnce(Promise.reject(new Error("process failed")));
 		const router : MockTopicRouter = new MockTopicRouter(TopicTestSchema);
 		router.setup();
 		const request : any = mockRequest({
@@ -172,7 +173,6 @@ describe('handleWebhookCall', () => {
 			}
 		});
 		const response : any = mockResponse();
-		router.failNextRequest();
 
 		await router.handleWebhookCall(request, response);
 
@@ -196,7 +196,9 @@ describe('handleWebhookCall', () => {
 		expect(response.json).toHaveBeenCalledWith(
 			new DataMessage({
 				desc: `Recieved data under topic: /test`,
-				body: new MockBody({ a: true }),
+				body: {
+					a: true
+				},
 				processedData: true
 			})
 		);

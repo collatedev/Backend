@@ -53,7 +53,12 @@ describe('subscribe', () => {
 
 	test('Should fail to send subscriptions due to a failed request', async () => {
 		process.env.NODE_ENV = "test";
-		FetchRequestBuilder.prototype.makeRequest = jest.fn().mockReturnValue(getRequestFailedResponse());
+		FetchRequestBuilder.prototype.makeRequest = jest.fn()
+			.mockReturnValueOnce(getRequestFailedResponse())
+			.mockReturnValueOnce(getRequestFailedResponse())
+			.mockReturnValueOnce(getRequestFailedResponse())
+			.mockReturnValueOnce(getRequestFailedResponse());
+
 		const twitch : ITwitchService = new TwitchService(new MockLogger());
 		await expect(twitch.subscribe(1)).rejects.toThrow(new Error("Request failed"));
 	});

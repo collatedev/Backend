@@ -19,7 +19,7 @@ describe("send", () => {
     
     test("It should send a request to the correct url", async () => {
         process.env.YOUTUBE_API_KEY = "api_key";
-        FetchRequestBuilder.prototype.makeRequest = jest.fn().mockReturnValue(Promise.resolve(new Response("", {
+        FetchRequestBuilder.prototype.makeRequest = jest.fn().mockReturnValueOnce(Promise.resolve(new Response("", {
             status: 200
         })));
         const request : IYoutubeRequest = new GetChannelByIDRequest("foo");

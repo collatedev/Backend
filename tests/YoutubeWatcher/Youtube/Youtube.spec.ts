@@ -23,7 +23,7 @@ afterEach(() => {
 describe("getChannel", () => {
     test("It gets a channel by name", async () => {
         process.env.YOUTUBE_API_KEY = "api_key";
-        FetchRequestBuilder.prototype.makeRequest = jest.fn().mockReturnValue(createYoutubePayload({
+        FetchRequestBuilder.prototype.makeRequest = jest.fn().mockReturnValueOnce(createYoutubePayload({
             id: "bar"
         }));
         const youtube : IYoutube = new Youtube();
@@ -45,7 +45,7 @@ describe("getChannel", () => {
 
     test("It fails to gets a channel by name", async () => {
         process.env.YOUTUBE_API_KEY = "api_key";
-        FetchRequestBuilder.prototype.makeRequest = jest.fn().mockReturnValue(createErrorPayload());
+        FetchRequestBuilder.prototype.makeRequest = jest.fn().mockReturnValueOnce(createErrorPayload());
         const youtube : IYoutube = new Youtube();
 
         await expect(youtube.getChannel("foo")).rejects.toThrow(new Error('Request failed'));
@@ -99,7 +99,7 @@ describe("subscribeToPushNotifications", () => {
     test("It subscribes to a channels push notifications", async () => {
         process.env.NODE_ENV = "test";
         process.env.YOUTUBE_API_KEY = "api_key";
-        FetchRequestBuilder.prototype.makeRequest = jest.fn().mockReturnValue(
+        FetchRequestBuilder.prototype.makeRequest = jest.fn().mockReturnValueOnce(
             Promise.resolve(new Response("", {
                 status: 202
             }
@@ -122,7 +122,7 @@ describe("subscribeToPushNotifications", () => {
     test("It fails to subscribe to a channels push notifications", async () => {
         process.env.NODE_ENV = "test";
         process.env.YOUTUBE_API_KEY = "api_key";
-        FetchRequestBuilder.prototype.makeRequest = jest.fn().mockReturnValue(createErrorPayload());
+        FetchRequestBuilder.prototype.makeRequest = jest.fn().mockReturnValueOnce(createErrorPayload());
         const youtube : IYoutube = new Youtube();
         const channel : IYoutubeChannel = getTestYoutubeChannel();
 

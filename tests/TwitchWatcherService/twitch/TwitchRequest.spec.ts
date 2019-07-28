@@ -25,7 +25,7 @@ const OLD_ENV : any = process.env;
 
 describe('send()', () => {
 	test('Should fail to get OAuth token for the request', async () => {
-		FetchRequestBuilder.prototype.makeRequest = jest.fn().mockReturnValue(getErrorResponse());
+		FetchRequestBuilder.prototype.makeRequest = jest.fn().mockReturnValueOnce(getErrorResponse());
 		const subscription : ITwitchSubscription = new TwitchSubscription(1, "user", "foo");
 		const request : ITwitchRequest = new MockTwitchRequest(subscription);
 		
@@ -33,7 +33,7 @@ describe('send()', () => {
 	});
 
 	test('Should fail to get OAuth token for the request due to error with request', async () => {
-		FetchRequestBuilder.prototype.makeRequest = jest.fn().mockReturnValue(getOAuthErrorResponse());
+		FetchRequestBuilder.prototype.makeRequest = jest.fn().mockReturnValueOnce(getOAuthErrorResponse());
 		const subscription : ITwitchSubscription = new TwitchSubscription(1, "user", "foo");
 		const request : ITwitchRequest = new MockTwitchRequest(subscription);
 
@@ -55,7 +55,7 @@ describe('send()', () => {
 	test('Should successfully send unauthorized request', async () => {
 		process.env.TWITCH_CLIENT_ID = "test-client";
 		FetchRequestBuilder.prototype.makeRequest = jest.fn()
-			.mockReturnValue(getVerificationResponse(StatusCodes.Accepted));
+			.mockReturnValueOnce(getVerificationResponse(StatusCodes.Accepted));
 
 		const subscription : ITwitchSubscription = new TwitchSubscription(1, "streams", "foo");
 		const request : ITwitchRequest = new MockTwitchRequest(subscription);
