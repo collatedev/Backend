@@ -26,13 +26,7 @@ describe("send", () => {
 
         const response : Response = await request.send();
 
-        expect(FetchRequestBuilder.prototype.makeRequest).toBeCalledWith(
-            'https://www.googleapis.com/youtube/v3/channels?part=snippet' +
-                '%2CcontentDetails%2Cstatistics&id=foo&key=api_key',
-            {
-                method: "GET"
-            }
-        );
+        expectYoutubeApiCall('channels?part=snippet%2CcontentDetails%2Cstatistics&id=foo&key=api_key');
         expect(response.status).toEqual(StatusCodes.OK);
     });
 
@@ -45,3 +39,12 @@ describe("send", () => {
         await expect(request.send()).rejects.toThrow(new Error('request failed'));
     });
 });
+
+function expectYoutubeApiCall(uri : string) : void {
+    expect(FetchRequestBuilder.prototype.makeRequest).toHaveBeenCalledWith(
+        `https://www.googleapis.com/youtube/v3/${uri}`,
+        {
+            method: "GET",
+        }
+    );
+}

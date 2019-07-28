@@ -99,12 +99,7 @@ describe("subscribeToPushNotifications", () => {
     test("It subscribes to a channels push notifications", async () => {
         process.env.NODE_ENV = "test";
         process.env.YOUTUBE_API_KEY = "api_key";
-        FetchRequestBuilder.prototype.makeRequest = jest.fn().mockReturnValueOnce(
-            Promise.resolve(new Response("", {
-                status: 202
-            }
-        )));
-        
+        FetchRequestBuilder.prototype.makeRequest = jest.fn().mockReturnValueOnce(getVerificationResponse());
         const youtube : IYoutube = new Youtube();
         const channel : IYoutubeChannel = getTestYoutubeChannel();
 
@@ -158,4 +153,10 @@ function getTestYoutubeChannel() : IYoutubeChannel {
             { id : "UCJU7oHhmt-EUa8KNfpuvDhA" }
         ]
     });
+}
+
+function getVerificationResponse() : Promise<Response> {
+    return Promise.resolve(new Response("", {
+        status: 202
+    }));
 }
