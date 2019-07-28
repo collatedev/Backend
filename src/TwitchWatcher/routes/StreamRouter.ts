@@ -1,5 +1,5 @@
 import TopicRouter from "./TopicRouter";
-import StreamRequestSchema from "../api/StreamRequest.json";
+import StreamRequestSchema from "../RequestSchemas/StreamRequest.json";
 import ILogger from "../../Logging/ILogger";
 import ValidationSchema from "../../RequestValidator/ValidationSchema/ValidationSchema";
 

@@ -1,4 +1,4 @@
-import AuthorizedTopic from "../../../src/TwitchWatcher/twitch/AuthorizedTopic";
+import AuthorizedTopic from "../../../src/TwitchWatcher/Twitch/AuthorizedTopic";
 
 describe('isAuthorizedTopic', () => {
     test('is an authorized topic', () => {

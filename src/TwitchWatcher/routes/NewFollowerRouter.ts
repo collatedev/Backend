@@ -1,5 +1,5 @@
 import TopicRouter from "./TopicRouter";
-import UserFollowRequestSchema from "../api/UserFollowRequest.json";
+import UserFollowRequestSchema from "../RequestSchemas/UserFollowRequest.json";
 import ILogger from "../../Logging/ILogger";
 import ValidationSchema from "../../RequestValidator/ValidationSchema/ValidationSchema";
 

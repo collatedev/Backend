@@ -1,6 +1,6 @@
 import mockResponse from '../../mocks/MockResponse';
 import mockRequest from '../../mocks/MockRequest';
-import ChallengeQueryRequestSchema from '../../../src/TwitchWatcher/api/WebhookChallengeRequest.json';
+import ChallengeQueryRequestSchema from '../../../src/RequestSchemas/WebhookChallengeRequest.json';
 import IValidationSchema from '../../../src/RequestValidator/ValidationSchema/IValidationSchema';
 import ValidationSchema from '../../../src/RequestValidator/ValidationSchema/ValidationSchema';
 import ILogger from '../../../src/Logging/ILogger';
@@ -8,7 +8,7 @@ import MockLogger from '../../mocks/MockLogger';
 import IRouteHandler from '../../../src/Router/IRouteHandler';
 import StatusCodes from '../../../src/Router/StatusCodes';
 import ErrorMessage from '../../../src/Router/Messages/ErrorMessage';
-import NewFollowerRouter from '../../../src/TwitchWatcher/routes/NewFollowerRouter';
+import NewFollowerRouter from '../../../src/TwitchWatcher/Routes/NewFollowerRouter';
 
 const ChallengeSchema : IValidationSchema = new ValidationSchema(ChallengeQueryRequestSchema);
 

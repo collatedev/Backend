@@ -1,9 +1,9 @@
-import IUserLayer from "../../src/TwitchWatcher/layers/IUserLayer";
-import IUserModel from "../../src/TwitchWatcher/models/IUserModel";
+import IUserLayer from "../../src/UserService/layers/IUserLayer";
+import IUserModel from "../../src/UserService/models/IUserModel";
 import MockUserModel from "./MockUserModel";
-import TwitchUser from "../../src/TwitchWatcher/schemas/user/TwitchUser";
-import SubscriptionBody from "../../src/TwitchWatcher/schemas/request/SubscriptionBody";
-import UnsubscriptionBody from "../../src/TwitchWatcher/schemas/request/UnsubscriptionBody";
+import IUser from "../../src/UserService/models/IUser";
+import YoutubeChannel from "../../src/UserService/Models/YoutubeChannel";
+import INewUserData from "../../src/UserService/Layers/INewUserData";
 
 export default class MockUserLayer implements IUserLayer {
     private userModel : IUserModel;
@@ -12,17 +12,25 @@ export default class MockUserLayer implements IUserLayer {
         this.userModel = userModel;
     }
 
-    public async getUserInfo(id: number) : Promise<TwitchUser> {
+    public async getUserInfo(id: number) : Promise<IUser> {
         return this.userModel.getByID(id);
     }
 
-    public async subscribe(subscriptionBody: SubscriptionBody) : Promise<TwitchUser> {
-        const userModel : TwitchUser = await this.userModel.getByID(subscriptionBody.userID);
-        return userModel;
+    public async subscribe(user : IUser) : Promise<IUser> {
+        return this.userModel.getByID(user.getID());
     }
 
-    public async unsubscribe(unsubscriptionBody: UnsubscriptionBody) : Promise<TwitchUser> {
-        const userModel : TwitchUser = await this.userModel.getByID(unsubscriptionBody.userID);
-        return userModel;
+    public async unsubscribe(user : IUser) : Promise<IUser> {
+        return this.userModel.getByID(user.getID());
+    }
+
+    public async createUser(newUserData : INewUserData) : Promise<IUser> {
+        return this.userModel.create(newUserData.twitchUserID, new YoutubeChannel(newUserData.youtubeChannelName, {
+            items : [{ id: "0" }]
+        }));
+    }
+
+    public async deleteUser(id : number) : Promise<IUser> {
+        return this.userModel.delete(id);
     }
 }

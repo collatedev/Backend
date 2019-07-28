@@ -2,17 +2,16 @@ import App from "./App";
 import * as Dotenv from "dotenv";
 import ILogger from "../Logging/ILogger";
 import Logger from "../Logging/Logger";
-import TwitchWatcherService from "../TwitchWatcher/TwitchWatcherService";
+import CollateApp from "./CollateApp";
 
 const PortIndex : number = 2;
 
 function main() : void {
 	Dotenv.config();
 	const logger : ILogger = getLogger();
-	const app : App = new App(logger);
+	const app : App = new CollateApp(logger);
+	
 	app.initialize();
-
-	app.registerService(new TwitchWatcherService(logger));
 
 	const port : number = parseInt(process.argv[PortIndex], 10);
 	app.start(port);

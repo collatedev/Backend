@@ -1,10 +1,10 @@
 import ITwitchRequest from "./ITwitchRequest";
 import { RequestInit, Response, Headers } from 'node-fetch';
 import TwitchResponse from "./TwitchResponse";
-import TwitchOAuthBearer from "../schemas/request/TwitchOAuthBearer";
+import TwitchOAuthBearer from "../RequestBody/request/TwitchOAuthBearer";
 import ITwitchRequestBody from "./ITwitchRequestBody";
-import IRequestBuilder from "../request_builder/IRequestBuilder";
-import TwitchOAuthBearerSchema from "../api/TwitchOAuthBearer.json";
+import IRequestBuilder from "../RequestBuilder/IRequestBuilder";
+import TwitchOAuthBearerSchema from "../RequestSchemas/TwitchOAuthBearer.json";
 import ITwitchResponse from "./ITwitchResponse";
 import IValidator from "../../RequestValidator/IValidator";
 import IValidationSchema from "../../RequestValidator/ValidationSchema/IValidationSchema";
