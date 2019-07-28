@@ -1,5 +1,4 @@
 import MockTopicRouter from "../../mocks/MockTopicRouter";
-import MockBody from "../../mocks/MockBody";
 import mockResponse from '../../mocks/MockResponse';
 import mockRequest from '../../mocks/MockRequest';
 import ChallengeQueryRequestSchema from '../../../src/RequestSchemas/WebhookChallengeRequest.json';
@@ -11,6 +10,7 @@ import TopicRouter from "../../../src/TwitchWatcher/Routes/TopicRouter";
 import IRouteHandler from "../../../src/Router/IRouteHandler";
 import ErrorMessage from "../../../src/Router/Messages/ErrorMessage";
 import DataMessage from "../../../src/Router/Messages/DataMessage";
+import validate from "../../../src/Router/Middleware/Validate";
 
 const ChallengeSchema : IValidationSchema = new ValidationSchema(ChallengeQueryRequestSchema);
 const TopicTestSchema : IValidationSchema = new ValidationSchema(TopicTestRequestSchema);
@@ -22,7 +22,7 @@ describe("validate() [middleware]", () => {
         const request : any = mockRequest({});
         const response : any = mockResponse();
 	
-		const middleWare : IRouteHandler = router.validate(ChallengeSchema);
+		const middleWare : IRouteHandler = validate(ChallengeSchema);
 		middleWare(request, response);
 		expect(response.status).toHaveBeenCalledWith(StatusCodes.BadRequest);
 		expect(response.json).toHaveBeenCalledWith(
@@ -47,7 +47,7 @@ describe("validate() [middleware]", () => {
 		});
 		const response : any = mockResponse();
 
-		const middleWare : IRouteHandler = router.validate(ChallengeSchema);
+		const middleWare : IRouteHandler = validate(ChallengeSchema);
 		middleWare(request, response);
 		expect(response.status).toHaveBeenCalledWith(StatusCodes.BadRequest);
 		expect(response.json).toHaveBeenCalledWith(
@@ -72,7 +72,7 @@ describe("validate() [middleware]", () => {
 		});
 		const response : any = mockResponse();
 
-		const middleWare : IRouteHandler = router.validate(ChallengeSchema);
+		const middleWare : IRouteHandler = validate(ChallengeSchema);
 		middleWare(request, response);
 		expect(response.status).toHaveBeenCalledWith(StatusCodes.BadRequest);
 		expect(response.json).toHaveBeenCalledWith(
@@ -97,7 +97,7 @@ describe("validate() [middleware]", () => {
 		});
 		const response : any = mockResponse();
 
-		const middleWare : IRouteHandler = router.validate(ChallengeSchema);
+		const middleWare : IRouteHandler = validate(ChallengeSchema);
 		middleWare(request, response);
 		expect(response.status).toHaveBeenCalledWith(StatusCodes.BadRequest);
 		expect(response.json).toHaveBeenCalledWith(
@@ -122,7 +122,7 @@ describe("validate() [middleware]", () => {
 		});
 		const response : any = mockResponse();
 
-		const middleWare : IRouteHandler = router.validate(TopicTestSchema);
+		const middleWare : IRouteHandler = validate(TopicTestSchema);
 		middleWare(request, response);
 		expect(response.status).toHaveBeenCalledWith(StatusCodes.BadRequest);
 		expect(response.json).toHaveBeenCalledWith(
@@ -163,6 +163,8 @@ describe('handleChallenge', () => {
 
 describe('handleWebhookCall', () => {
 	test('Should fail to process data', async () => {
+		MockTopicRouter.prototype.handleWebhookData = jest.fn()
+			.mockReturnValueOnce(Promise.reject(new Error("process failed")));
 		const router : MockTopicRouter = new MockTopicRouter(TopicTestSchema);
 		router.setup();
 		const request : any = mockRequest({
@@ -171,7 +173,6 @@ describe('handleWebhookCall', () => {
 			}
 		});
 		const response : any = mockResponse();
-		router.failNextRequest();
 
 		await router.handleWebhookCall(request, response);
 
@@ -195,7 +196,9 @@ describe('handleWebhookCall', () => {
 		expect(response.json).toHaveBeenCalledWith(
 			new DataMessage({
 				desc: `Recieved data under topic: /test`,
-				body: new MockBody({ a: true }),
+				body: {
+					a: true
+				},
 				processedData: true
 			})
 		);

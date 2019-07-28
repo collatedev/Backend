@@ -1,9 +1,8 @@
 import YoutubeRequest from "./YoutubeRequest";
-import IRequestBuilder from "../../TwitchWatcher/RequestBuilder/IRequestBuilder";
 
 export default class GetChannelByIDRequest extends YoutubeRequest {
-    constructor(requestBuilder : IRequestBuilder, channelID : string) {
-        super(getAPIURI(channelID), requestBuilder);
+    constructor(channelID : string) {
+        super(getAPIURI(channelID));
     }
 }
 

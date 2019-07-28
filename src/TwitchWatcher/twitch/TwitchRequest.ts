@@ -12,6 +12,7 @@ import Validator from "../../RequestValidator/Validator";
 import ValidationSchema from "../../RequestValidator/ValidationSchema/ValidationSchema";
 import IValidationResult from "../../RequestValidator/ValidationResult/IValidationResult";
 import Validatable from "../../RequestValidator/Request/Validatable";
+import FetchRequestBuilder from "../RequestBuilder/FetchRequestBuilder";
 
 type TwitchResolver = (response: ITwitchResponse) => void;
 type TwitchRejector = (error: Error) => void;
@@ -25,8 +26,8 @@ export default abstract class TwitchRequest implements ITwitchRequest {
 	private body: ITwitchRequestBody;
 	private tokenValidator : IValidator;
 
-	constructor(body: ITwitchRequestBody, requestBuilder: IRequestBuilder) {
-		this.requestBuilder = requestBuilder;
+	constructor(body: ITwitchRequestBody) {
+		this.requestBuilder = new FetchRequestBuilder();
 		this.body = body;
 		this.tokenValidator = new Validator();
 		this.buildRequest = this.buildRequest.bind(this);

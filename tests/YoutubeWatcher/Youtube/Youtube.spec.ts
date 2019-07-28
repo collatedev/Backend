@@ -2,7 +2,6 @@ import IYoutube from "../../../src/YoutubeWatcher/Youtube/IYoutube";
 import Youtube from "../../../src/YoutubeWatcher/Youtube/Youtube";
 import IYoutubeChannel from "../../../src/UserService/models/IYoutubeChannel";
 import { Response } from "node-fetch";
-import IRequestBuilder from "../../../src/TwitchWatcher/RequestBuilder/IRequestBuilder";
 import FetchRequestBuilder from "../../../src/TwitchWatcher/RequestBuilder/FetchRequestBuilder";
 import YoutubeChannel from "../../../src/UserService/Models/YoutubeChannel";
 import FormData from "form-data";
@@ -24,15 +23,15 @@ afterEach(() => {
 describe("getChannel", () => {
     test("It gets a channel by name", async () => {
         process.env.YOUTUBE_API_KEY = "api_key";
-        FetchRequestBuilder.prototype.makeRequest = jest.fn().mockReturnValue(createYoutubePayload({
+        FetchRequestBuilder.prototype.makeRequest = jest.fn().mockReturnValueOnce(createYoutubePayload({
             id: "bar"
         }));
-        const requestBuilder : IRequestBuilder = new FetchRequestBuilder();
-        const youtube : IYoutube = new Youtube(requestBuilder);
+        const youtube : IYoutube = new Youtube();
 
         const channel : IYoutubeChannel = await youtube.getChannel("foo");
 
-        expect(requestBuilder.makeRequest).toHaveBeenCalledWith(
+        expectYoutubeApiCall('channels?part=snippet%2CcontentDetails%2Cstatistics&forUsername=foo&key=api_key');
+        expect(FetchRequestBuilder.prototype.makeRequest).toHaveBeenCalledWith(
             'https://www.googleapis.com/youtube/v3/channels?part=snippet%2' +
                 'CcontentDetails%2Cstatistics&forUsername=foo' +
                 '&key=api_key',
@@ -46,9 +45,8 @@ describe("getChannel", () => {
 
     test("It fails to gets a channel by name", async () => {
         process.env.YOUTUBE_API_KEY = "api_key";
-        FetchRequestBuilder.prototype.makeRequest = jest.fn().mockReturnValue(createErrorPayload());
-        const requestBuilder : IRequestBuilder = new FetchRequestBuilder();
-        const youtube : IYoutube = new Youtube(requestBuilder);
+        FetchRequestBuilder.prototype.makeRequest = jest.fn().mockReturnValueOnce(createErrorPayload());
+        const youtube : IYoutube = new Youtube();
 
         await expect(youtube.getChannel("foo")).rejects.toThrow(new Error('Request failed'));
     });
@@ -63,16 +61,13 @@ describe("getChannel", () => {
                     title: "Test Title"
                 }
             }));
-        const requestBuilder : IRequestBuilder = new FetchRequestBuilder();
-        const youtube : IYoutube = new Youtube(requestBuilder);
+
+        const youtube : IYoutube = new Youtube();
 
         const channel : IYoutubeChannel = await youtube.getChannel("foo");
 
-        expectYoutubeApiCall(
-            requestBuilder, 
-            'channels?part=snippet%2CcontentDetails%2Cstatistics&forUsername=foo&key=api_key'
-        );
-        expectYoutubeApiCall(requestBuilder, 'channels?part=snippet%2CcontentDetails%2Cstatistics&id=foo&key=api_key');
+        expectYoutubeApiCall('channels?part=snippet%2CcontentDetails%2Cstatistics&forUsername=foo&key=api_key');
+        expectYoutubeApiCall('channels?part=snippet%2CcontentDetails%2Cstatistics&id=foo&key=api_key');
         expect(channel.channelName()).toEqual("Test Title");
         expect(channel.getID()).toEqual("bar");
     });
@@ -82,8 +77,7 @@ describe("getChannel", () => {
         FetchRequestBuilder.prototype.makeRequest = jest.fn()
             .mockReturnValueOnce(createYoutubePayload())
             .mockReturnValueOnce(createErrorPayload());
-        const requestBuilder : IRequestBuilder = new FetchRequestBuilder();
-        const youtube : IYoutube = new Youtube(requestBuilder);
+        const youtube : IYoutube = new Youtube();
 
         await expect(youtube.getChannel("foo")).rejects.toThrow(new Error('Request failed'));
     });
@@ -93,8 +87,7 @@ describe("getChannel", () => {
         FetchRequestBuilder.prototype.makeRequest = jest.fn()
             .mockReturnValueOnce(createYoutubePayload())
             .mockReturnValueOnce(createYoutubePayload());
-        const requestBuilder : IRequestBuilder = new FetchRequestBuilder();
-        const youtube : IYoutube = new Youtube(requestBuilder);
+        const youtube : IYoutube = new Youtube();
 
         await expect(youtube.getChannel("foo")).rejects.toThrow(
             new Error('Could not find a youtube channel by name or id of "foo"')
@@ -106,18 +99,13 @@ describe("subscribeToPushNotifications", () => {
     test("It subscribes to a channels push notifications", async () => {
         process.env.NODE_ENV = "test";
         process.env.YOUTUBE_API_KEY = "api_key";
-        FetchRequestBuilder.prototype.makeRequest = jest.fn().mockReturnValue(
-            Promise.resolve(new Response("", {
-                status: 202
-            }
-        )));
-        const requestBuilder : IRequestBuilder = new FetchRequestBuilder();
-        const youtube : IYoutube = new Youtube(requestBuilder);
+        FetchRequestBuilder.prototype.makeRequest = jest.fn().mockReturnValueOnce(getVerificationResponse());
+        const youtube : IYoutube = new Youtube();
         const channel : IYoutubeChannel = getTestYoutubeChannel();
 
         await youtube.subscribeToPushNotifications(channel);
 
-        expect(requestBuilder.makeRequest).toHaveBeenCalledWith(
+        expect(FetchRequestBuilder.prototype.makeRequest).toHaveBeenCalledWith(
             'https://pubsubhubbub.appspot.com/subscribe',
             expect.objectContaining({
                 method: "POST",
@@ -129,9 +117,8 @@ describe("subscribeToPushNotifications", () => {
     test("It fails to subscribe to a channels push notifications", async () => {
         process.env.NODE_ENV = "test";
         process.env.YOUTUBE_API_KEY = "api_key";
-        FetchRequestBuilder.prototype.makeRequest = jest.fn().mockReturnValue(createErrorPayload());
-        const requestBuilder : IRequestBuilder = new FetchRequestBuilder();
-        const youtube : IYoutube = new Youtube(requestBuilder);
+        FetchRequestBuilder.prototype.makeRequest = jest.fn().mockReturnValueOnce(createErrorPayload());
+        const youtube : IYoutube = new Youtube();
         const channel : IYoutubeChannel = getTestYoutubeChannel();
 
         await expect(youtube.subscribeToPushNotifications(channel)).rejects.toThrow(new Error('Request failed'));
@@ -151,8 +138,8 @@ function createErrorPayload() : Promise<Response> {
     return Promise.reject(new Error("Request failed"));
 }
 
-function expectYoutubeApiCall(requestBuilder : IRequestBuilder, uri : string) : void {
-    expect(requestBuilder.makeRequest).toHaveBeenCalledWith(
+function expectYoutubeApiCall(uri : string) : void {
+    expect(FetchRequestBuilder.prototype.makeRequest).toHaveBeenCalledWith(
         `https://www.googleapis.com/youtube/v3/${uri}`,
         {
             method: "GET",
@@ -166,4 +153,10 @@ function getTestYoutubeChannel() : IYoutubeChannel {
             { id : "UCJU7oHhmt-EUa8KNfpuvDhA" }
         ]
     });
+}
+
+function getVerificationResponse() : Promise<Response> {
+    return Promise.resolve(new Response("", {
+        status: 202
+    }));
 }

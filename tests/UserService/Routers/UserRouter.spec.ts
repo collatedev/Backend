@@ -13,6 +13,7 @@ import DataMessage from '../../../src/Router/Messages/DataMessage';
 import GetUserRequestSchema from '../../../src/UserService/RequestSchemas/GetUserRequest.json';
 import ValidationSchema from '../../../src/RequestValidator/ValidationSchema/ValidationSchema';
 import NewUserData from '../../../src/UserService/Layers/NewUserData';
+import validate from '../../../src/Router/Middleware/Validate';
 
 const logger : ILogger = new MockLogger();
 
@@ -27,7 +28,7 @@ describe("validate() [middleware]", () => {
         });
 		const response : any = mockResponse();
 	
-		const middleWare : IRouteHandler = router.validate(new ValidationSchema(GetUserRequestSchema));
+		const middleWare : IRouteHandler = validate(new ValidationSchema(GetUserRequestSchema));
         middleWare(request, response);
         expect(response.status).toHaveBeenCalledWith(StatusCodes.BadRequest);
         expect(response.json).toHaveBeenCalledWith(

@@ -2,6 +2,7 @@ import IYoutubeRequest from "./IYoutubeRequest";
 import { Response } from "node-fetch";
 import Path from "path";
 import IRequestBuilder from "../../TwitchWatcher/RequestBuilder/IRequestBuilder";
+import FetchRequestBuilder from "../../TwitchWatcher/RequestBuilder/FetchRequestBuilder";
 
 const YoutubeBaseAPIURL : string = "www.googleapis.com/youtube/v3/";
 
@@ -9,9 +10,9 @@ export default abstract class YoutubeRequest implements IYoutubeRequest {
     private url : string;
     private requestBuilder : IRequestBuilder;
 
-    constructor(url : string, requestBuilder : IRequestBuilder) {
+    constructor(url : string) {
         this.url = `https://${Path.join(YoutubeBaseAPIURL, url)}`;
-        this.requestBuilder = requestBuilder;
+        this.requestBuilder = new FetchRequestBuilder();
     }
 
     public async send() : Promise<Response> {
