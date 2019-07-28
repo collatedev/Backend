@@ -15,7 +15,7 @@ export default class UserService extends Service {
         const userLayer : IUserLayer = new UserLayer(
             new UserModel(), 
             new TwitchService(new FetchRequestBuilder(), new SecretGenerator(), logger),
-            new Youtube(new FetchRequestBuilder())
+            new Youtube()
         );
 
         this.registerAPI(new UserServiceAPI(userLayer, logger));

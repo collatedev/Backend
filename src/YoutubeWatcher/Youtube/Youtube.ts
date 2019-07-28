@@ -8,22 +8,23 @@ import { Response } from "node-fetch";
 import YoutubeWebhookBody from "../Webhook/YoutubeWebhookBody";
 import WebhookCallbackURL from "../../DeveloperTools/WebhookCallbackURL";
 import GetChannelByIDRequest from "./GetChannelByIDRequest";
+import FetchRequestBuilder from "../../TwitchWatcher/RequestBuilder/FetchRequestBuilder";
 
 const YoutubeHubURL : string = "https://pubsubhubbub.appspot.com/subscribe";
 
 export default class Youtube implements IYoutube {
     private requestBuilder : IRequestBuilder;
 
-    constructor(requestBuilder : IRequestBuilder) {
-        this.requestBuilder = requestBuilder;
+    constructor() {
+        this.requestBuilder = new FetchRequestBuilder();
     }
 
     public async getChannel(name : string) : Promise<IYoutubeChannel> {
-        let request : IYoutubeRequest = new GetChannelRequest(this.requestBuilder, name);
+        let request : IYoutubeRequest = new GetChannelRequest(name);
         let response : Response = await request.send();
         let payload : any = await response.json();
         if (payload.items.length === 0) {
-            request = new GetChannelByIDRequest(this.requestBuilder, name); 
+            request = new GetChannelByIDRequest(name); 
             response = await request.send();
             payload = await response.json();
             if (payload.items.length === 0) {

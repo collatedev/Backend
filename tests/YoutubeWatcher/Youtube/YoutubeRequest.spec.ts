@@ -1,7 +1,6 @@
 import IYoutubeRequest from "../../../src/YoutubeWatcher/Youtube/IYoutubeRequest";
 import MockYoutubeRequest from "../../mocks/MockYoutubeRequest";
 import FetchRequestBuilder from "../../../src/TwitchWatcher/RequestBuilder/FetchRequestBuilder";
-import IRequestBuilder from "../../../src/TwitchWatcher/RequestBuilder/IRequestBuilder";
 import StatusCodes from "../../../src/Router/StatusCodes";
 import { Response } from "node-fetch";
 
@@ -12,12 +11,11 @@ describe("send", () => {
         FetchRequestBuilder.prototype.makeRequest = jest.fn().mockReturnValue(Promise.resolve(new Response("", {
             status: 200
         })));
-        const requestBuilder : IRequestBuilder = new FetchRequestBuilder();
-        const request : IYoutubeRequest = new MockYoutubeRequest(requestBuilder);
+        const request : IYoutubeRequest = new MockYoutubeRequest();
 
         const response : Response = await request.send();
 
-        expect(requestBuilder.makeRequest).toBeCalledWith(
+        expect(FetchRequestBuilder.prototype.makeRequest).toBeCalledWith(
             'https://www.googleapis.com/youtube/v3/test',
             {
                 method: "GET"
@@ -30,8 +28,7 @@ describe("send", () => {
         FetchRequestBuilder.prototype.makeRequest = jest.fn().mockImplementation(() => {
             return Promise.reject(new Error('request failed'));
         });
-        const requestBuilder : IRequestBuilder = new FetchRequestBuilder();
-        const request : IYoutubeRequest = new MockYoutubeRequest(requestBuilder);
+        const request : IYoutubeRequest = new MockYoutubeRequest();
 
         await expect(request.send()).rejects.toThrow(new Error('request failed'));
     });

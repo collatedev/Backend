@@ -1,6 +1,5 @@
 import IYoutubeRequest from "../../../src/YoutubeWatcher/Youtube/IYoutubeRequest";
 import FetchRequestBuilder from "../../../src/TwitchWatcher/RequestBuilder/FetchRequestBuilder";
-import IRequestBuilder from "../../../src/TwitchWatcher/RequestBuilder/IRequestBuilder";
 import StatusCodes from "../../../src/Router/StatusCodes";
 import { Response } from "node-fetch";
 import GetChannelRequest from "../../../src/YoutubeWatcher/Youtube/GetChannelRequest";
@@ -25,12 +24,11 @@ describe("send", () => {
         FetchRequestBuilder.prototype.makeRequest = jest.fn().mockReturnValue(Promise.resolve(new Response("", {
             status: 200
         })));
-        const requestBuilder : IRequestBuilder = new FetchRequestBuilder();
-        const request : IYoutubeRequest = new GetChannelRequest(requestBuilder, "foo");
+        const request : IYoutubeRequest = new GetChannelRequest("foo");
 
         const response : Response = await request.send();
 
-        expect(requestBuilder.makeRequest).toBeCalledWith(
+        expect(FetchRequestBuilder.prototype.makeRequest).toBeCalledWith(
             'https://www.googleapis.com/youtube/v3/channels?part=snippet' +
                 '%2CcontentDetails%2Cstatistics&forUsername=foo' +
                 '&key=api_key',
@@ -45,8 +43,7 @@ describe("send", () => {
         FetchRequestBuilder.prototype.makeRequest = jest.fn().mockImplementation(() => {
             return Promise.reject(new Error('request failed'));
         });
-        const requestBuilder : IRequestBuilder = new FetchRequestBuilder();
-        const request : IYoutubeRequest = new GetChannelRequest(requestBuilder, "foo");
+        const request : IYoutubeRequest = new GetChannelRequest("foo");
 
         await expect(request.send()).rejects.toThrow(new Error('request failed'));
     });
