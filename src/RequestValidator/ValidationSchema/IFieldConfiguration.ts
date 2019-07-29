@@ -7,4 +7,5 @@ export default interface IFieldConfiguration {
     startsWith?: string;
     length?: number;
     arrayLengths?: number[];
+    isInt? : boolean | undefined;
 }

@@ -101,6 +101,12 @@ export default class Sanitizer implements ISanitizer {
     }
 
     private sanitizeNumber(value : any, configuration : IFieldConfiguration) : void {
+        if (this.isNotInt(value, configuration)) {
+            this.errorHandler.handleError(
+                [value], 
+                ErrorType.NonIntValueError
+            );
+        }
         if (this.isOutOfRange(value, configuration)) {
             // this joins the array as a string of the form "x, y". We know range is not undefined due to
             // the isOutOfRangeMethod
@@ -110,6 +116,11 @@ export default class Sanitizer implements ISanitizer {
                 ErrorType.OutOfRangeError
             );
         }
+    }
+
+    private isNotInt(value : any, configuration : IFieldConfiguration) : boolean {
+        return configuration.isInt !== undefined &&
+            !Number.isInteger(value);
     }
 
     private isOutOfRange(value : any, configuration : IFieldConfiguration) : boolean {

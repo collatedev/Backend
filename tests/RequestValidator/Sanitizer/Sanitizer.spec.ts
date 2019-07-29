@@ -143,6 +143,40 @@ test("Sanitizes a number within the range", () => {
     }, configuration));
 });
 
+test("Sanitizes a number that is an int", () => {
+    const sanitizer : ISanitizer = new Sanitizer(new PathBuilder(), EmptyValidationSchema);
+    const configuration : ITypeConfiguration = new TypeConfiguration({
+        foo: {
+            type: "number",
+            required: true,
+            isInt: true
+        }
+    });
+
+    assertValidResult(sanitizer.sanitize({
+        foo: 1
+    }, configuration));
+});
+
+test("Sanitizes a number that is not an int", () => {
+    const sanitizer : ISanitizer = new Sanitizer(new PathBuilder(), EmptyValidationSchema);
+    const configuration : ITypeConfiguration = new TypeConfiguration({
+        foo: {
+            type: "number",
+            required: true,
+            isInt: true
+        }
+    });
+
+    assertResultHasError(
+        sanitizer.sanitize({
+            foo: 2.1
+        }, configuration), 
+        "foo", 
+        "The value '2.1' must be an int"
+    );
+});
+ 
 test("Sanitizes an enum with with an unknown enum value", () => {
     const sanitizer : ISanitizer = new Sanitizer(new PathBuilder(), EmptyValidationSchema);
     const configuration : ITypeConfiguration = new TypeConfiguration({
