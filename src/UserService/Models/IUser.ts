@@ -4,8 +4,7 @@ import { Document } from "mongoose";
 import IWebhookInfo from './IWebhookInfo';
 
 export default interface IUser extends Document {
-    twitchID : number;
+    twitchUser : ITwitchUser;
     youtubeChannel : IYoutubeChannel;
     webhooks: IWebhookInfo[];
-    getTwitchUser() : ITwitchUser;
 }

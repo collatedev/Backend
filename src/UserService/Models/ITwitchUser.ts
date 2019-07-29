@@ -1,3 +1,3 @@
 export default interface ITwitchUser {
-    userID() : number;
+    userID : number;
 }

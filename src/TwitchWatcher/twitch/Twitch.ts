@@ -31,7 +31,7 @@ export default class Twitch implements ITwitch {
 	public async subscribe(user : ITwitchUser) : Promise<void> {
 		try {
 			const callbackURL : string = await WebhookCallbackURL.getCallbackURL("twitch/topic");
-			const requests : SubscribeRequest[] = this.getSubscribeRequests(user.userID(), callbackURL);
+			const requests : SubscribeRequest[] = this.getSubscribeRequests(user.userID, callbackURL);
 			await this.makeWebhookRequests(requests);
 			this.logger.info(
 				`Successfully completed Twich subscription requests to all topics for user (id=${user}) to all webhooks`
@@ -44,7 +44,7 @@ export default class Twitch implements ITwitch {
 	public async unsubscribe(user: ITwitchUser) : Promise<void> {
 		try {
 			const callbackURL : string = await WebhookCallbackURL.getCallbackURL("/twitch/topic");
-			const requests : UnsubscribeRequest[] = this.getUnsubscribeRequests(user.userID(), callbackURL);
+			const requests : UnsubscribeRequest[] = this.getUnsubscribeRequests(user.userID, callbackURL);
 			await this.makeWebhookRequests(requests);
 			this.logger.info(
 				`Successfully completed Twich subscription requests to all topics for user (id=${user}) to all webhooks`

@@ -5,6 +5,7 @@ import IUser from "../Models/IUser";
 import INewUserData from "./INewUserData";
 import IYoutube from "../../YoutubeWatcher/Youtube/IYoutube";
 import IYoutubeChannel from "../Models/IYoutubeChannel";
+import ITwitchUser from "../Models/ITwitchUser";
 
 export default class UserLayer implements IUserLayer {
     private twitch : ITwitch;
@@ -24,13 +25,13 @@ export default class UserLayer implements IUserLayer {
     }
 
     public async subscribe(user : IUser) : Promise<IUser> {
-        await this.twitch.subscribe(user.getTwitchUser());
+        await this.twitch.subscribe(user.twitchUser);
         await this.youtube.subscribeToPushNotifications(user.youtubeChannel);
         return user;
 	}
 
     public async unsubscribe(user : IUser): Promise<IUser> {
-        await this.twitch.unsubscribe(user.getTwitchUser());
+        await this.twitch.unsubscribe(user.twitchUser);
         return user;
     }
 
@@ -47,8 +48,9 @@ export default class UserLayer implements IUserLayer {
 
     private async saveUser(newUserData : INewUserData) : Promise<IUser> {
         const youtubeChannel : IYoutubeChannel = await this.youtube.getChannel(newUserData.youtubeChannelName);
+        const twitchUser : ITwitchUser = await this.twitch.getUser(newUserData.twitchUserName);
         return new UserModel({
-            twitchID: newUserData.twitchUserID, 
+            twitchUser,
             youtubeChannel
         }).save();
     }

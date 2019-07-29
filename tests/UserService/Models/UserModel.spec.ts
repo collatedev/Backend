@@ -4,6 +4,7 @@ import IUser from "../../../src/UserService/Models/IUser";
 import YoutubeChannel from "../../../src/UserService/Models/YoutubeChannel";
 import IYoutubeChannel from "../../../src/UserService/Models/IYoutubeChannel";
 import TwitchUser from "../../../src/UserService/Models/TwitchUser";
+import ITwitchUser from "../../../src/UserService/Models/ITwitchUser";
 
 const db : MockDB = new MockDB();
 
@@ -21,7 +22,8 @@ afterEach(async () => {
 
 test("Should find a user", async () => {
     const channel : IYoutubeChannel = createYoutubeChannel("foo", "bar", "baz");
-    const user : IUser = await createUser(0, channel);
+    const twitchUser : ITwitchUser = new TwitchUser(0);
+    const user : IUser = await createUser(twitchUser, channel);
 
     const result : IUser = await User.findById(user.id).exec() as IUser;
 
@@ -31,7 +33,9 @@ test("Should find a user", async () => {
         title: "baz",
         youtubeID: "bar"
     });
-    expect(result.twitchID).toEqual(0);
+    expect(result.twitchUser).toMatchObject({
+        userID: 0
+    });
 });
 
 test("Should find a null user", async () => {
@@ -41,7 +45,10 @@ test("Should find a null user", async () => {
 });
 
 test("Should remove a user", async () => {
-    const user : IUser = await createUser(0, createYoutubeChannel("foo", "bar", "baz"));
+    const user : IUser = await createUser(
+        new TwitchUser(0), 
+        createYoutubeChannel("foo", "bar", "baz")
+    );
 
     await user.remove();
 
@@ -49,17 +56,9 @@ test("Should remove a user", async () => {
     expect(result).toBeNull();
 });
 
-test("Should get twitch user", async () => {
-    const user : IUser = await createUser(0, createYoutubeChannel("foo", "bar", "baz"));
-
-    const result : IUser = await User.findById(user.id).exec() as IUser;
-
-    expect(result.getTwitchUser()).toEqual(new TwitchUser(0));
-});
-
-async function createUser(twitchID : number, youtubeChannel : IYoutubeChannel) : Promise<IUser> {
+async function createUser(twitchUser : ITwitchUser, youtubeChannel : IYoutubeChannel) : Promise<IUser> {
     const user : IUser = new User({
-        twitchID,
+        twitchUser,
         youtubeChannel
     });
     return user.save();

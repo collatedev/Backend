@@ -37,7 +37,7 @@ describe('getUser', () => {
 
 		const user : ITwitchUser = await twitch.getUser("foo");
 
-		expect(user.userID()).toEqual(0);
+		expect(user.userID).toEqual(0);
 	});
 });
 
