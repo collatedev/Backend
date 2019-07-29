@@ -1,4 +1,4 @@
-import FetchRequestBuilder from "../../../src/TwitchWatcher/RequestBuilder/FetchRequestBuilder";
+import FetchRequestBuilder from "../../src/HTTPRequestBuilder/FetchRequestBuilder";
 
 test("Should make a request", (done : any) => {
 	const requestBuilder : FetchRequestBuilder = new FetchRequestBuilder();

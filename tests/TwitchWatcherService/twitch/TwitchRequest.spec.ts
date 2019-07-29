@@ -6,7 +6,7 @@ import MockTwitchRequest from "../../mocks/MockTwitchRequest";
 import ITwitchRequest from "../../../src/TwitchWatcher/Twitch/ITwitchRequest";
 import TwitchResponse from "../../../src/TwitchWatcher/Twitch/TwitchResponse";
 import SecretGenerator from "../../../src/TwitchWatcher/Twitch/SecretGenerator";
-import FetchRequestBuilder from "../../../src/TwitchWatcher/RequestBuilder/FetchRequestBuilder";
+import FetchRequestBuilder from "../../../src/HTTPRequestBuilder/FetchRequestBuilder";
 import StatusCodes from "../../../src/Router/StatusCodes";
 import ITwitchResponse from "../../../src/TwitchWatcher/Twitch/ITwitchResponse";
 

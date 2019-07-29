@@ -2,11 +2,11 @@ import IYoutube from "../../../src/YoutubeWatcher/Youtube/IYoutube";
 import Youtube from "../../../src/YoutubeWatcher/Youtube/Youtube";
 import IYoutubeChannel from "../../../src/UserService/Models/IYoutubeChannel";
 import { Response } from "node-fetch";
-import FetchRequestBuilder from "../../../src/TwitchWatcher/RequestBuilder/FetchRequestBuilder";
+import FetchRequestBuilder from "../../../src/HTTPRequestBuilder/FetchRequestBuilder";
 import YoutubeChannel from "../../../src/UserService/Models/YoutubeChannel";
 import FormData from "form-data";
 
-jest.mock("../../../src/TwitchWatcher/RequestBuilder/FetchRequestBuilder");
+jest.mock("../../../src/HTTPRequestBuilder/FetchRequestBuilder");
 
 const OLD_ENV : any = process.env;
 

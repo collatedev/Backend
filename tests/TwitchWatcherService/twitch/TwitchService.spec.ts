@@ -1,9 +1,9 @@
 import { Response } from 'node-fetch';
 import StatusCodes from '../../../src/Router/StatusCodes';
 import MockLogger from '../../mocks/MockLogger';
-import ITwitchService from '../../../src/TwitchWatcher/Twitch/ITwitchService';
-import TwitchService from '../../../src/TwitchWatcher/Twitch/TwitchService';
-import FetchRequestBuilder from '../../../src/TwitchWatcher/RequestBuilder/FetchRequestBuilder';
+import ITwitch from '../../../src/TwitchWatcher/Twitch/ITwitch';
+import Twitch from '../../../src/TwitchWatcher/Twitch/Twitch';
+import FetchRequestBuilder from '../../../src/HTTPRequestBuilder/FetchRequestBuilder';
 import SecretGenerator from '../../../src/TwitchWatcher/Twitch/SecretGenerator';
 
 describe('subscribe', () => {
@@ -29,7 +29,7 @@ describe('subscribe', () => {
 			.mockReturnValueOnce(getAuthorizationResponse(StatusCodes.Accepted))
 			.mockReturnValueOnce(getAuthorizationResponse(StatusCodes.Accepted));
 
-		const twitch : ITwitchService = new TwitchService(new MockLogger());
+		const twitch : ITwitch = new Twitch(new MockLogger());
 		await twitch.subscribe(1);
 	});
 
@@ -42,7 +42,7 @@ describe('subscribe', () => {
 			.mockReturnValueOnce(getAuthorizationResponse(StatusCodes.BadRequest))
 			.mockReturnValueOnce(getAuthorizationResponse(StatusCodes.BadRequest));
 
-		const twitch : ITwitchService = new TwitchService(new MockLogger());
+		const twitch : ITwitch = new Twitch(new MockLogger());
 
 		await expect(twitch.subscribe(1)).rejects.toEqual(new Error(
 			`Failed to subscribe to {"hub.mode":"subscribe","hub.topic":"https://api.twitch.tv/` +
@@ -59,7 +59,7 @@ describe('subscribe', () => {
 			.mockReturnValueOnce(getRequestFailedResponse())
 			.mockReturnValueOnce(getRequestFailedResponse());
 
-		const twitch : ITwitchService = new TwitchService(new MockLogger());
+		const twitch : ITwitch = new Twitch(new MockLogger());
 		await expect(twitch.subscribe(1)).rejects.toThrow(new Error("Request failed"));
 	});
 });

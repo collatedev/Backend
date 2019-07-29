@@ -4,14 +4,14 @@ import TwitchSubscription from './TwitchSubscription';
 import TwitchTopics from "./TwitchTopics";
 import ITwitchRequest from "./ITwitchRequest";
 import ITwitchResponse from "./ITwitchResponse";
-import ITwitchService from "./ITwitchService";
+import ITwitch from "./ITwitch";
 import ILogger from "../../Logging/ILogger";
 import StatusCodes from "../../Router/StatusCodes";
 import WebhookCallbackURL from '../../DeveloperTools/WebhookCallbackURL';
 
 type PendingTwitchResponse = Promise<ITwitchResponse>;
 
-export default class TwitchService implements ITwitchService {
+export default class Twitch implements ITwitch {
 	private logger : ILogger;
 
 	constructor(logger : ILogger) {

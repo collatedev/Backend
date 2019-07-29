@@ -1,4 +1,4 @@
-import FetchRequestBuilder from "../../../src/TwitchWatcher/RequestBuilder/FetchRequestBuilder";
+import FetchRequestBuilder from "../../../src/HTTPRequestBuilder/FetchRequestBuilder";
 import GetChannelByIDRequest from "../../../src/YoutubeWatcher/Youtube/GetChannelByIDRequest";
 import StatusCodes from "../../../src/Router/StatusCodes";
 import IYoutubeRequest from "../../../src/YoutubeWatcher/Youtube/IYoutubeRequest";

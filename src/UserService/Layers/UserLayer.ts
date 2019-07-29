@@ -1,16 +1,16 @@
 import IUserLayer from "./IUserLayer";
 import UserModel from "../Models/UserModel";
-import ITwitchService from "../../TwitchWatcher/Twitch/ITwitchService";
+import ITwitch from "../../TwitchWatcher/Twitch/ITwitch";
 import IUser from "../Models/IUser";
 import INewUserData from "./INewUserData";
 import IYoutube from "../../YoutubeWatcher/Youtube/IYoutube";
 import IYoutubeChannel from "../Models/IYoutubeChannel";
 
 export default class UserLayer implements IUserLayer {
-    private twitch : ITwitchService;
+    private twitch : ITwitch;
     private youtube : IYoutube;
 
-    constructor(twitch : ITwitchService, youtube : IYoutube) {
+    constructor(twitch : ITwitch, youtube : IYoutube) {
         this.twitch = twitch;
         this.youtube = youtube;
     }

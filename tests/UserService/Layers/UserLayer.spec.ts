@@ -6,12 +6,12 @@ import IYoutubeChannel from '../../../src/UserService/Models/IYoutubeChannel';
 import MockDB from '../../mocks/MockDB';
 import UserModel from '../../../src/UserService/Models/UserModel';
 import Youtube from '../../../src/YoutubeWatcher/Youtube/Youtube';
-import TwitchService from '../../../src/TwitchWatcher/Twitch/TwitchService';
+import Twitch from '../../../src/TwitchWatcher/Twitch/Twitch';
 import MockLogger from '../../mocks/MockLogger';
 import NewUserData from '../../../src/UserService/Layers/NewUserData';
 
 jest.mock('../../../src/YoutubeWatcher/Youtube/Youtube');
-jest.mock('../../../src/TwitchWatcher/Twitch/TwitchService');
+jest.mock('../../../src/TwitchWatcher/Twitch/Twitch');
 
 const db : MockDB = new MockDB();
 
@@ -69,7 +69,7 @@ describe("subscribe", () => {
     test("Should fail to subscribe to webhooks", async () => {
         const channel : IYoutubeChannel = createYoutubeChannel("foo", "bar", "baz");
         const user : IUser = await createUser(1, channel);
-        TwitchService.prototype.subscribe = jest.fn().mockReturnValueOnce(
+        Twitch.prototype.subscribe = jest.fn().mockReturnValueOnce(
             Promise.reject(new Error("Subscription failed"))
         );
         const layer : IUserLayer = getUserLayer();
@@ -94,7 +94,7 @@ describe("unsubscribe", () => {
     test("Should fail to unsubscribe to webhooks", async () => {
         const channel : IYoutubeChannel = createYoutubeChannel("foo", "bar", "baz");
         const savedUser : IUser = await createUser(1, channel);
-        TwitchService.prototype.unsubscribe = jest.fn().mockReturnValueOnce(
+        Twitch.prototype.unsubscribe = jest.fn().mockReturnValueOnce(
             Promise.reject(new Error("Subscription failed"))
         );
         const layer : IUserLayer = getUserLayer();
@@ -133,7 +133,7 @@ function createYoutubeChannel(name : string, id: string, title : string) : IYout
 }
 
 function getUserLayer() : IUserLayer {
-    return new UserLayer(new TwitchService(new MockLogger()), new Youtube());
+    return new UserLayer(new Twitch(new MockLogger()), new Youtube());
 }
 
 async function createUser(twitchID : number, channel : IYoutubeChannel) : Promise<IUser> {

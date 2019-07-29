@@ -15,12 +15,12 @@ import UserLayer from '../../../src/UserService/Layers/UserLayer';
 import IUser from '../../../src/UserService/Models/IUser';
 import UserModel from '../../../src/UserService/Models/UserModel';
 import Youtube from '../../../src/YoutubeWatcher/Youtube/Youtube';
-import TwitchService from '../../../src/TwitchWatcher/Twitch/TwitchService';
+import Twitch from '../../../src/TwitchWatcher/Twitch/Twitch';
 import IYoutubeChannel from '../../../src/UserService/Models/IYoutubeChannel';
 import YoutubeChannel from '../../../src/UserService/Models/YoutubeChannel';
 
 jest.mock('../../../src/YoutubeWatcher/Youtube/Youtube');
-jest.mock('../../../src/TwitchWatcher/Twitch/TwitchService');
+jest.mock('../../../src/TwitchWatcher/Twitch/Twitch');
 
 const logger : ILogger = new MockLogger();
 const userLayer : IUserLayer = getUserLayer();
@@ -111,5 +111,5 @@ function createYoutubeChannel(name : string, id: string, title : string) : IYout
 }
 
 function getUserLayer() : IUserLayer {
-    return new UserLayer(new TwitchService(new MockLogger()), new Youtube());
+    return new UserLayer(new Twitch(new MockLogger()), new Youtube());
 }

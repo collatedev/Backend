@@ -3,7 +3,7 @@ import { RequestInit, Response, Headers } from 'node-fetch';
 import TwitchResponse from "./TwitchResponse";
 import TwitchOAuthBearer from "../RequestBody/request/TwitchOAuthBearer";
 import ITwitchRequestBody from "./ITwitchRequestBody";
-import IRequestBuilder from "../RequestBuilder/IRequestBuilder";
+import IHTTPRequestBuilder from "../../HTTPRequestBuilder/IHTTPRequestBuilder";
 import TwitchOAuthBearerSchema from "../RequestSchemas/TwitchOAuthBearer.json";
 import ITwitchResponse from "./ITwitchResponse";
 import IValidator from "../../RequestValidator/IValidator";
@@ -12,7 +12,7 @@ import Validator from "../../RequestValidator/Validator";
 import ValidationSchema from "../../RequestValidator/ValidationSchema/ValidationSchema";
 import IValidationResult from "../../RequestValidator/ValidationResult/IValidationResult";
 import Validatable from "../../RequestValidator/Request/Validatable";
-import FetchRequestBuilder from "../RequestBuilder/FetchRequestBuilder";
+import FetchRequestBuilder from "../../HTTPRequestBuilder/FetchRequestBuilder";
 
 type TwitchResolver = (response: ITwitchResponse) => void;
 type TwitchRejector = (error: Error) => void;
@@ -22,7 +22,7 @@ const TokenValidationSchema : IValidationSchema = new ValidationSchema(TwitchOAu
 export default abstract class TwitchRequest implements ITwitchRequest {
 	private readonly SubscriptionEndpoint : string = "https://api.twitch.tv/helix/webhooks/hub";
 	
-	private requestBuilder : IRequestBuilder;
+	private requestBuilder : IHTTPRequestBuilder;
 	private body: ITwitchRequestBody;
 	private tokenValidator : IValidator;
 
