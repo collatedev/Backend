@@ -11,6 +11,8 @@ import WebhookCallbackURL from '../../DeveloperTools/WebhookCallbackURL';
 import ITwitchUser from '../../UserService/Models/ITwitchUser';
 import GetUserRequest from './GetUserRequest';
 import TwitchUser from '../../UserService/Models/TwitchUser';
+import IWebhookInfo from '../../UserService/Models/IWebhookInfo';
+import ITwitchWebhookRequest from './ITwitchWebhookRequest';
 
 type PendingTwitchResponse = Promise<ITwitchResponse>;
 
@@ -25,36 +27,41 @@ export default class Twitch implements ITwitch {
 		const getUserRequest : ITwitchRequest = new GetUserRequest(userName);
 		const response : ITwitchResponse = await getUserRequest.send();
 		const payload : any = await response.response().json();
+		if (payload.data.length === 0) {
+			throw new Error(`Could not find user with login "${userName}"`);
+		}
 		return new TwitchUser(payload.data[0].id);
 	}
 
-	public async subscribe(user : ITwitchUser) : Promise<void> {
+	public async subscribe(user : ITwitchUser) : Promise<IWebhookInfo[]> {
 		try {
 			const callbackURL : string = await WebhookCallbackURL.getCallbackURL("twitch/topic");
-			const requests : SubscribeRequest[] = this.getSubscribeRequests(user.userID, callbackURL);
+			const requests : ITwitchWebhookRequest[] = this.getSubscribeRequests(user.userID, callbackURL);
 			await this.makeWebhookRequests(requests);
 			this.logger.info(
 				`Successfully completed Twich subscription requests to all topics for user (id=${user}) to all webhooks`
 			);	
+			return this.getWebhooks(requests);
 		} catch (error) {
 			throw error;
 		}
 	}
 
-	public async unsubscribe(user: ITwitchUser) : Promise<void> {
+	public async unsubscribe(user: ITwitchUser) : Promise<IWebhookInfo[]> {
 		try {
 			const callbackURL : string = await WebhookCallbackURL.getCallbackURL("/twitch/topic");
-			const requests : UnsubscribeRequest[] = this.getUnsubscribeRequests(user.userID, callbackURL);
+			const requests : ITwitchWebhookRequest[] = this.getUnsubscribeRequests(user.userID, callbackURL);
 			await this.makeWebhookRequests(requests);
 			this.logger.info(
 				`Successfully completed Twich subscription requests to all topics for user (id=${user}) to all webhooks`
-			);	
+			);
+			return this.getWebhooks(requests);
 		} catch (error) {
 			throw error;
 		}
 	}
 
-	private getSubscribeRequests(userID: number, callbackURL: string) : SubscribeRequest[] {
+	private getSubscribeRequests(userID: number, callbackURL: string) : ITwitchWebhookRequest[] {
 		const requests : SubscribeRequest[] = [];
 		for (const topic of TwitchTopics) {
 			requests.push(new SubscribeRequest(new TwitchSubscription(userID, topic, callbackURL)));
@@ -62,8 +69,8 @@ export default class Twitch implements ITwitch {
 		return requests;
 	}
 
-	private getUnsubscribeRequests(userID: number, callbackURL: string) : SubscribeRequest[] {
-		const requests : SubscribeRequest[] = [];
+	private getUnsubscribeRequests(userID: number, callbackURL: string) : ITwitchWebhookRequest[] {
+		const requests : UnsubscribeRequest[] = [];
 		for (const topic of TwitchTopics) {
 			requests.push(new UnsubscribeRequest(new TwitchSubscription(userID, topic, callbackURL)));
 		}
@@ -91,5 +98,13 @@ export default class Twitch implements ITwitch {
 			messages.push(request.send());
 		}
 		return messages;
+	}
+
+	private getWebhooks(requests : ITwitchWebhookRequest[]) : IWebhookInfo[] {
+		const webhooks : IWebhookInfo[] = [];
+		for (const request of requests) {
+			webhooks.push(request.getWebhook());
+		}
+		return webhooks;
 	}
 }

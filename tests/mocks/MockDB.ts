@@ -22,6 +22,7 @@ export default class MockDB {
         this.connection = await mongoose.connect(url, {
             useNewUrlParser: true
         });
+        mongoose.set('useFindAndModify', false);
 
         this.db = this.connection.connection.db;
     }

@@ -9,7 +9,7 @@ export default class WebhookCallbackURL {
             // BUG: This should be an env variable
             return `${this.localhostCallbackURL}/${path}`;
         } else if (process.env.NODE_ENV === 'test') {
-            return "endpoint_url";
+            return `endpoint_url/${path}`;
         } else {
             return `${await Ngrok.getURL()}/api/v1/${path}`;
         }

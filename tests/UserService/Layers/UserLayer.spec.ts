@@ -11,6 +11,8 @@ import MockLogger from '../../mocks/MockLogger';
 import NewUserData from '../../../src/UserService/Layers/NewUserData';
 import TwitchUser from '../../../src/UserService/Models/TwitchUser';
 import ITwitchUser from '../../../src/UserService/Models/ITwitchUser';
+import WebhookInfo from '../../../src/UserService/Models/WebhookInfo';
+import Service from '../../../src/UserService/Models/Service';
 
 jest.mock('../../../src/YoutubeWatcher/Youtube/Youtube');
 jest.mock('../../../src/TwitchWatcher/Twitch/Twitch');
@@ -60,6 +62,13 @@ describe('getUserInfo', () => {
 
 describe("subscribe", () => {
     test("Should subscribe to webhooks", async () => {
+        Twitch.prototype.subscribe = jest.fn().mockReturnValueOnce([
+            new WebhookInfo(Service.Twitch, "foo", "bar"),
+            new WebhookInfo(Service.Twitch, "foo", "bar"),
+            new WebhookInfo(Service.Twitch, "foo", "bar"),
+            new WebhookInfo(Service.Twitch, "foo", "bar")
+        ]);
+        const length : number = 5;
         const channel : IYoutubeChannel = createYoutubeChannel("foo", "bar", "baz");
         const twitchUser : ITwitchUser = new TwitchUser(1);
         const layer : IUserLayer = getUserLayer();
@@ -69,7 +78,7 @@ describe("subscribe", () => {
 
         expect(user.twitchUser).toEqual(twitchUser);
         expect(user.youtubeChannel).toEqual(channel);
-        expect(Array.from(user.webhooks)).toEqual([]);
+        expect(Array.from(user.webhooks)).toHaveLength(length);
     });
 
     test("Should fail to subscribe to webhooks", async () => {
@@ -115,9 +124,19 @@ describe("unsubscribe", () => {
 describe("createUser", () => {
     test("successfully create user", async () => {
         const channel : IYoutubeChannel = createYoutubeChannel("foo", "bar", "baz");
+        const length : number = 5;
         const twitchUser : ITwitchUser = new TwitchUser(1);
         Twitch.prototype.getUser = jest.fn().mockReturnValueOnce(twitchUser);
+        Twitch.prototype.subscribe = jest.fn().mockReturnValueOnce([
+            new WebhookInfo(Service.Twitch, "foo", "bar"),
+            new WebhookInfo(Service.Twitch, "foo", "bar"),
+            new WebhookInfo(Service.Twitch, "foo", "bar"),
+            new WebhookInfo(Service.Twitch, "foo", "bar")
+        ]);
         Youtube.prototype.getChannel = jest.fn().mockReturnValueOnce(channel);
+        Youtube.prototype.subscribeToPushNotifications = jest.fn().mockReturnValueOnce(
+            new WebhookInfo(Service.Youtube, "foo", "bar")
+        );
         const layer : IUserLayer = getUserLayer();
 
         const user : IUser = await layer.createUser(new NewUserData({
@@ -125,10 +144,21 @@ describe("createUser", () => {
             youtubeChannelName: "foo"
         }));
 
-
         expect(user.youtubeChannel).toEqual(channel);
-        expect(Array.from(user.webhooks)).toEqual([]);
+        expect(Array.from(user.webhooks)).toHaveLength(length);
         expect(user.twitchUser).toEqual(twitchUser);
+    });
+
+    test("fails to create user", async () => {
+        Youtube.prototype.getChannel = jest.fn().mockReturnValueOnce(
+            Promise.reject(new Error("Subscription failed"))
+        );
+        const layer : IUserLayer = getUserLayer();
+
+        await expect(layer.createUser(new NewUserData({
+            twitchUserName: "foo",
+            youtubeChannelName: "foo"
+        }))).rejects.toThrow("Subscription failed");
     });
 });
 

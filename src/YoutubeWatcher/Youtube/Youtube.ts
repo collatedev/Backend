@@ -9,6 +9,9 @@ import YoutubeWebhookBody from "../Webhook/YoutubeWebhookBody";
 import WebhookCallbackURL from "../../DeveloperTools/WebhookCallbackURL";
 import GetChannelByIDRequest from "./GetChannelByIDRequest";
 import FetchRequestBuilder from "../../HTTPRequestBuilder/FetchRequestBuilder";
+import IWebhookInfo from "../../UserService/Models/IWebhookInfo";
+import WebhookInfo from "../../UserService/Models/WebhookInfo";
+import Service from "../../UserService/Models/Service";
 
 const YoutubeHubURL : string = "https://pubsubhubbub.appspot.com/subscribe";
 
@@ -35,12 +38,13 @@ export default class Youtube implements IYoutube {
         return new YoutubeChannel(name, payload);
     }
 
-    public async subscribeToPushNotifications(channel : IYoutubeChannel) : Promise<void> {
-        const callbackURL : string = await WebhookCallbackURL.getCallbackURL("youtube/");
+    public async subscribeToPushNotifications(channel : IYoutubeChannel) : Promise<IWebhookInfo> {
+        const callbackURL : string = await WebhookCallbackURL.getCallbackURL("youtube");
         const body : YoutubeWebhookBody  = new YoutubeWebhookBody("subscribe", callbackURL, channel.youtubeID);
         await this.requestBuilder.makeRequest(YoutubeHubURL, {
             method: "POST",
             body: body.getBody()
         });
+        return new WebhookInfo(Service.Youtube, callbackURL, body.getTopic());
     }
 }

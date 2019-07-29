@@ -13,11 +13,15 @@ export default class YoutubeWebhookBody {
         this.channelID = channelID;
     }
 
+    public getTopic() : string {
+        return `https://www.youtube.com/xml/feeds/videos.xml?channel_id=${this.channelID}`;
+    }
+
     public getBody() : FormData {
         const form : FormData = new FormData();
         form.append("hub.mode", this.mode);
         form.append("hub.callback", this.callbackURL);
-        form.append("hub.topic", `https://www.youtube.com/xml/feeds/videos.xml?channel_id=${this.channelID}`);
+        form.append("hub.topic", this.getTopic());
         form.append("hub.lease_seconds", LeaseSeconds);
         return form;
     }

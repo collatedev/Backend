@@ -66,12 +66,11 @@ export default class UserRouter extends Router {
 	}
 
 	private async createUser(request : Request, response : Response) : Promise<void> {
-		const user : IUser = await this.userLayer.createUser(request.body);
 		try {
-			await this.userLayer.subscribe(user);
+			const user : IUser = await this.userLayer.createUser(request.body);
+			this.sendData(response, user.toJSON(), StatusCodes.OK);
 		} catch (error) {
-			this.sendError(response, "Failed to subscribe user to webhooks", StatusCodes.BadRequest);
+			this.sendError(response, "Failed to create user", StatusCodes.BadRequest);
 		}
-		return this.sendData(response, user.toJSON(), StatusCodes.OK);
 	}
 }

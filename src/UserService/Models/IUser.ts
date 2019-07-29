@@ -7,4 +7,5 @@ export default interface IUser extends Document {
     twitchUser : ITwitchUser;
     youtubeChannel : IYoutubeChannel;
     webhooks: IWebhookInfo[];
+    addWebhook(webhook : IWebhookInfo) : Promise<void>;
 }
