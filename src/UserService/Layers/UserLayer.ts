@@ -1,25 +1,26 @@
 import IUserLayer from "./IUserLayer";
-import IUserModel from "../models/IUserModel";
+import UserModel from "../Models/UserModel";
 import ITwitchService from "../../TwitchWatcher/Twitch/ITwitchService";
-import IUser from "../models/IUser";
+import IUser from "../Models/IUser";
 import INewUserData from "./INewUserData";
 import IYoutube from "../../YoutubeWatcher/Youtube/IYoutube";
-import IYoutubeChannel from "../models/IYoutubeChannel";
+import IYoutubeChannel from "../Models/IYoutubeChannel";
 
 export default class UserLayer implements IUserLayer {
-    private userModel: IUserModel;
     private twitch : ITwitchService;
     private youtube : IYoutube;
 
-    constructor(userModel: IUserModel, twitch : ITwitchService, youtube : IYoutube) {
-        this.userModel = userModel;
+    constructor(twitch : ITwitchService, youtube : IYoutube) {
         this.twitch = twitch;
         this.youtube = youtube;
     }
 
-    public async getUserInfo(id: number) : Promise<IUser> {
+    public async getUserInfo(id: string) : Promise<IUser> {
         try {
-            const user : IUser = await this.userModel.getByID(id);
+            const user : IUser | null = await UserModel.findById(id).exec();
+            if (user === null) {
+                throw new Error("user not found");
+            }
             return user;
         } catch (exception) {
             throw new Error(`Failed to find a user with the id: ${id}`);
@@ -28,7 +29,7 @@ export default class UserLayer implements IUserLayer {
 
     public async subscribe(user : IUser) : Promise<IUser> {
         await this.twitch.subscribe(user.getTwitchUser().userID());
-        await this.youtube.subscribeToPushNotifications(user.getYoutubeChannel());
+        await this.youtube.subscribeToPushNotifications(user.youtubeChannel);
         return user;
 	}
 
@@ -39,18 +40,32 @@ export default class UserLayer implements IUserLayer {
 
     public async deleteUser(id : number) : Promise<IUser> {
         try {
-            return await this.userModel.delete(id);
+            const user : IUser | null = await UserModel.findByIdAndDelete(id).exec();
+            if (user === null) {
+                throw new Error("User not found");
+            }
+            return user;
         } catch (error) {
             throw error;
         }
     }
 
     public async createUser(newUserData : INewUserData) : Promise<IUser> {
-        const youtubeChannel : IYoutubeChannel = await this.youtube.getChannel(newUserData.youtubeChannelName);
+        const user : IUser = await this.saveUser(newUserData);
         try {
-            return await this.userModel.create(newUserData.twitchUserID, youtubeChannel);
+            await this.subscribe(user);
+            return user;
         } catch (error) {
+            await user.remove();
             throw error;
         }
+    }
+
+    private async saveUser(newUserData : INewUserData) : Promise<IUser> {
+        const youtubeChannel : IYoutubeChannel = await this.youtube.getChannel(newUserData.youtubeChannelName);
+        return new UserModel({
+            twitchID: newUserData.twitchUserID, 
+            youtubeChannel
+        }).save();
     }
 }

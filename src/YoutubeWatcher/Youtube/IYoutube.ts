@@ -1,4 +1,4 @@
-import IYoutubeChannel from "../../UserService/models/IYoutubeChannel";
+import IYoutubeChannel from "../../UserService/Models/IYoutubeChannel";
 
 export default interface IYoutube {
     getChannel(name : string) : Promise<IYoutubeChannel>;

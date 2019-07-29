@@ -1,5 +1,5 @@
 import IYoutube from "./IYoutube";
-import IYoutubeChannel from "../../UserService/models/IYoutubeChannel";
+import IYoutubeChannel from "../../UserService/Models/IYoutubeChannel";
 import IYoutubeRequest from "./IYoutubeRequest";
 import GetChannelRequest from "./GetChannelRequest";
 import IRequestBuilder from "../../TwitchWatcher/RequestBuilder/IRequestBuilder";
@@ -37,7 +37,7 @@ export default class Youtube implements IYoutube {
 
     public async subscribeToPushNotifications(channel : IYoutubeChannel) : Promise<void> {
         const callbackURL : string = await WebhookCallbackURL.getCallbackURL("youtube/");
-        const body : YoutubeWebhookBody  = new YoutubeWebhookBody("subscribe", callbackURL, channel.getID());
+        const body : YoutubeWebhookBody  = new YoutubeWebhookBody("subscribe", callbackURL, channel.youtubeID);
         await this.requestBuilder.makeRequest(YoutubeHubURL, {
             method: "POST",
             body: body.getBody()

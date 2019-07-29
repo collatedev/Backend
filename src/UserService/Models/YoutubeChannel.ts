@@ -1,19 +1,13 @@
 import IYoutubeChannel from "./IYoutubeChannel";
 
 export default class YoutubeChannel implements IYoutubeChannel {
-    private name : string;
-    private id : string;
+    public readonly channelName : string;
+    public readonly youtubeID : string;
+    public readonly title : string;
 
     constructor(name : string, payload : any) {
-        this.name = name;
-        this.id = payload.items[0].id;
-    }
-
-    public channelName() : string {
-        return this.name;
-    }
-
-    public getID() : string {
-        return this.id;
+        this.channelName = name;
+        this.youtubeID = payload.items[0].id;
+        this.title = payload.items[0].snippet.title;
     }
 }

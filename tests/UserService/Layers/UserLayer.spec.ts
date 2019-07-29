@@ -1,26 +1,64 @@
-import FakeUserModel from '../../mocks/MockUserModel';
-import MockTwitchService from '../../mocks/MockTwitchService';
 import IUserLayer from '../../../src/UserService/layers/IUserLayer';
 import UserLayer from '../../../src/UserService/layers/UserLayer';
-import IUser from '../../../src/UserService/models/IUser';
-import TwitchUser from '../../../src/UserService/Models/TwitchUser';
+import IUser from '../../../src/UserService/Models/IUser';
 import YoutubeChannel from '../../../src/UserService/Models/YoutubeChannel';
-import MockYoutubeService from '../../mocks/MockYoutubeService';
+import IYoutubeChannel from '../../../src/UserService/Models/IYoutubeChannel';
+import MockDB from '../../mocks/MockDB';
+import UserModel from '../../../src/UserService/Models/UserModel';
+import Youtube from '../../../src/YoutubeWatcher/Youtube/Youtube';
+import TwitchService from '../../../src/TwitchWatcher/Twitch/TwitchService';
+import MockLogger from '../../mocks/MockLogger';
+
+jest.mock('../../../src/UserService/Models/YoutubeChannel');
+jest.mock('../../../src/TwitchWatcher/Twitch/TwitchService');
+
+const db : MockDB = new MockDB();
+
+beforeAll(async () => {
+    await db.start();
+});
+
+afterAll(async () => {
+    await db.stop();
+});
+
+afterEach(async () => {
+    await db.cleanup();
+});
+
 
 describe('getUserInfo', () => {
     it('Should get a user with id 1', async () => {
-        const userModel : FakeUserModel = new FakeUserModel();
-        await userModel.create(1, new YoutubeChannel("foo", {
-            items: [{ id: "bar" }]
-        }));
-        const layer : IUserLayer = new UserLayer(userModel, new MockTwitchService(), new MockYoutubeService());
-        
-        const user : IUser = await layer.getUserInfo(0);
+        const channel : IYoutubeChannel = createYoutubeChannel("foo", "bar", "baz");
+        Youtube.prototype.getChannel = jest.fn().mockReturnValueOnce(Promise.resolve(channel));
+        const savedUser : IUser = await createUser(1, channel);
+        const layer : IUserLayer = getUserLayer();
 
-        expect(user.getID()).toEqual(0);
-        expect(user.getTwitchUser()).toEqual(new TwitchUser(1));
-        expect(user.getYoutubeChannel()).toEqual(new YoutubeChannel("foo", {
-            items: [{ id: "bar" }]
-        }));
+        const user : IUser = await layer.getUserInfo(savedUser._id);
+
+        expect(user.toJSON()).toEqual(savedUser.toJSON());
     });
 });
+
+function createYoutubeChannel(name : string, id: string, title : string) : IYoutubeChannel {
+    return new YoutubeChannel(name, {
+        items: [{ 
+            id,
+            snippet: {
+                title
+            }
+        }]
+    });
+}
+
+function getUserLayer() : IUserLayer {
+    return new UserLayer(new TwitchService(new MockLogger()), new Youtube());
+}
+
+async function createUser(twitchID : number, channel : IYoutubeChannel) : Promise<IUser> {
+    const user : IUser = new UserModel({
+        twitchID,
+        youtubeChannel: channel
+    });
+    return user.save();
+} 

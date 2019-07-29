@@ -1,26 +1,28 @@
-import IUserModel from "./IUserModel";
+import mongoose, { Schema } from "mongoose";
 import IUser from "./IUser";
-import User from "./User";
-import IYoutubeChannel from "./IYoutubeChannel";
-import YoutubeChannel from "./YoutubeChannel";
+import ITwitchUser from "./ITwitchUser";
+import TwitchUser from "./TwitchUser";
 
-const twitchTestID : number = 56682227;
-const youtubeChannelTestID : string = "UCJU7oHhmt-EUa8KNfpuvDhA";
-
-export default class UserModel implements IUserModel {
-    public async getByID(id: number) : Promise<IUser> {
-        return new User(id, twitchTestID, new YoutubeChannel("test", {
-            items: { id : youtubeChannelTestID }
-        }));
+const UserSchema : Schema = new Schema({
+    twitchID: Number,
+    youtubeChannelName: {
+        channelName: String,
+        youtubeID: String,
+        title: String
+    },
+    webhooks: {
+        type: [{
+            expirationDate: Date,
+            topicURL: String,
+            callbackURL: String,
+            service: String
+        }],
+        default: []
     }
+});
 
-    public async create(twitchID : number, channel : IYoutubeChannel) : Promise<IUser> {
-        return new User(1, twitchID, channel);
-    }
+UserSchema.methods.getTwitchUser = function() : ITwitchUser {
+    return new TwitchUser(this.twitchID);
+};
 
-    public async delete(id : number) : Promise<IUser> {
-        return new User(id, twitchTestID, new YoutubeChannel("test", {
-            items: { id : youtubeChannelTestID }
-        }));
-    }
-}
+export default mongoose.model<IUser>('User', UserSchema);

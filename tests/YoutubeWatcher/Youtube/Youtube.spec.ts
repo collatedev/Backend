@@ -1,6 +1,6 @@
 import IYoutube from "../../../src/YoutubeWatcher/Youtube/IYoutube";
 import Youtube from "../../../src/YoutubeWatcher/Youtube/Youtube";
-import IYoutubeChannel from "../../../src/UserService/models/IYoutubeChannel";
+import IYoutubeChannel from "../../../src/UserService/Models/IYoutubeChannel";
 import { Response } from "node-fetch";
 import FetchRequestBuilder from "../../../src/TwitchWatcher/RequestBuilder/FetchRequestBuilder";
 import YoutubeChannel from "../../../src/UserService/Models/YoutubeChannel";
@@ -24,23 +24,19 @@ describe("getChannel", () => {
     test("It gets a channel by name", async () => {
         process.env.YOUTUBE_API_KEY = "api_key";
         FetchRequestBuilder.prototype.makeRequest = jest.fn().mockReturnValueOnce(createYoutubePayload({
-            id: "bar"
+            id: "bar",
+            snippet: {
+                title: "Test Title"
+            }
         }));
         const youtube : IYoutube = new Youtube();
 
         const channel : IYoutubeChannel = await youtube.getChannel("foo");
 
         expectYoutubeApiCall('channels?part=snippet%2CcontentDetails%2Cstatistics&forUsername=foo&key=api_key');
-        expect(FetchRequestBuilder.prototype.makeRequest).toHaveBeenCalledWith(
-            'https://www.googleapis.com/youtube/v3/channels?part=snippet%2' +
-                'CcontentDetails%2Cstatistics&forUsername=foo' +
-                '&key=api_key',
-            {
-                method: "GET",
-            }
-        );
-        expect(channel.channelName()).toEqual("foo");
-        expect(channel.getID()).toEqual("bar");
+        expect(channel.channelName).toEqual("foo");
+        expect(channel.youtubeID).toEqual("bar");
+        expect(channel.title).toEqual("Test Title");
     });
 
     test("It fails to gets a channel by name", async () => {
@@ -68,8 +64,8 @@ describe("getChannel", () => {
 
         expectYoutubeApiCall('channels?part=snippet%2CcontentDetails%2Cstatistics&forUsername=foo&key=api_key');
         expectYoutubeApiCall('channels?part=snippet%2CcontentDetails%2Cstatistics&id=foo&key=api_key');
-        expect(channel.channelName()).toEqual("Test Title");
-        expect(channel.getID()).toEqual("bar");
+        expect(channel.channelName).toEqual("Test Title");
+        expect(channel.youtubeID).toEqual("bar");
     });
 
     test("It fails to get a channel by id", async () => {
@@ -101,7 +97,7 @@ describe("subscribeToPushNotifications", () => {
         process.env.YOUTUBE_API_KEY = "api_key";
         FetchRequestBuilder.prototype.makeRequest = jest.fn().mockReturnValueOnce(getVerificationResponse());
         const youtube : IYoutube = new Youtube();
-        const channel : IYoutubeChannel = getTestYoutubeChannel();
+        const channel : IYoutubeChannel = getTestYoutubeChannel("test", "UCJU7oHhmt-EUa8KNfpuvDhA", "bar");
 
         await youtube.subscribeToPushNotifications(channel);
 
@@ -119,7 +115,7 @@ describe("subscribeToPushNotifications", () => {
         process.env.YOUTUBE_API_KEY = "api_key";
         FetchRequestBuilder.prototype.makeRequest = jest.fn().mockReturnValueOnce(createErrorPayload());
         const youtube : IYoutube = new Youtube();
-        const channel : IYoutubeChannel = getTestYoutubeChannel();
+        const channel : IYoutubeChannel = getTestYoutubeChannel("test", "UCJU7oHhmt-EUa8KNfpuvDhA", "bar");
 
         await expect(youtube.subscribeToPushNotifications(channel)).rejects.toThrow(new Error('Request failed'));
     });
@@ -147,10 +143,15 @@ function expectYoutubeApiCall(uri : string) : void {
     );
 }
 
-function getTestYoutubeChannel() : IYoutubeChannel {
-    return new YoutubeChannel("test", {
+function getTestYoutubeChannel(name : string, id: string, title: string) : IYoutubeChannel {
+    return new YoutubeChannel(name, {
         items: [
-            { id : "UCJU7oHhmt-EUa8KNfpuvDhA" }
+            { 
+                id,
+                snippet: {
+                    title
+                }
+            }
         ]
     });
 }
