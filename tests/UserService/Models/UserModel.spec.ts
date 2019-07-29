@@ -20,11 +20,18 @@ afterEach(async () => {
 });
 
 test("Should find a user", async () => {
-    const user : IUser = await createUser(0, createYoutubeChannel("foo", "bar", "baz"));
+    const channel : IYoutubeChannel = createYoutubeChannel("foo", "bar", "baz");
+    const user : IUser = await createUser(0, channel);
 
     const result : IUser = await User.findById(user.id).exec() as IUser;
 
-    expect(result.toJSON()).toEqual(user.toJSON());
+    expect(Array.from(result.webhooks)).toEqual([]);
+    expect(result.youtubeChannel).toMatchObject({
+        channelName: "foo",
+        title: "baz",
+        youtubeID: "bar"
+    });
+    expect(result.twitchID).toEqual(0);
 });
 
 test("Should find a null user", async () => {

@@ -5,7 +5,7 @@ import TwitchUser from "./TwitchUser";
 
 const UserSchema : Schema = new Schema({
     twitchID: Number,
-    youtubeChannelName: {
+    youtubeChannel: {
         channelName: String,
         youtubeID: String,
         title: String

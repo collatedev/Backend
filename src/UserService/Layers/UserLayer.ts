@@ -16,15 +16,11 @@ export default class UserLayer implements IUserLayer {
     }
 
     public async getUserInfo(id: string) : Promise<IUser> {
-        try {
-            const user : IUser | null = await UserModel.findById(id).exec();
-            if (user === null) {
-                throw new Error("user not found");
-            }
-            return user;
-        } catch (exception) {
-            throw new Error(`Failed to find a user with the id: ${id}`);
-        }   
+        const user : IUser | null = await UserModel.findById(id).exec();
+        if (user === null) {
+            throw new Error(`User with id = "${id}" not found`);
+        }
+        return user;  
     }
 
     public async subscribe(user : IUser) : Promise<IUser> {
@@ -36,18 +32,6 @@ export default class UserLayer implements IUserLayer {
     public async unsubscribe(user : IUser): Promise<IUser> {
         await this.twitch.unsubscribe(user.getTwitchUser().userID());
         return user;
-    }
-
-    public async deleteUser(id : number) : Promise<IUser> {
-        try {
-            const user : IUser | null = await UserModel.findByIdAndDelete(id).exec();
-            if (user === null) {
-                throw new Error("User not found");
-            }
-            return user;
-        } catch (error) {
-            throw error;
-        }
     }
 
     public async createUser(newUserData : INewUserData) : Promise<IUser> {

@@ -45,7 +45,11 @@ export default class MockDB {
                     if (this.db === null) {
                         return;
                     }
-                    await this.db.collection(collection).drop();
+                    try {
+                        await this.db.collection(collection).drop();
+                    } catch (error) {
+                        return;
+                    }
                 })
         );
     }
