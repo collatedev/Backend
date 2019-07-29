@@ -24,13 +24,13 @@ export default class UserLayer implements IUserLayer {
     }
 
     public async subscribe(user : IUser) : Promise<IUser> {
-        await this.twitch.subscribe(user.getTwitchUser().userID());
+        await this.twitch.subscribe(user.getTwitchUser());
         await this.youtube.subscribeToPushNotifications(user.youtubeChannel);
         return user;
 	}
 
     public async unsubscribe(user : IUser): Promise<IUser> {
-        await this.twitch.unsubscribe(user.getTwitchUser().userID());
+        await this.twitch.unsubscribe(user.getTwitchUser());
         return user;
     }
 

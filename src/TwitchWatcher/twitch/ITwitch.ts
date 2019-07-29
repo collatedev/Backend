@@ -1,4 +1,7 @@
+import ITwitchUser from "../../UserService/Models/ITwitchUser";
+
 export default interface ITwitch {
-    subscribe(userID : number) : Promise<void>;
-    unsubscribe(userID: number) : Promise<void>;
+    getUser(userName : string) : Promise<ITwitchUser>;
+    subscribe(user : ITwitchUser) : Promise<void>;
+    unsubscribe(user: ITwitchUser) : Promise<void>;
 }
