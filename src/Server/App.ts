@@ -36,6 +36,8 @@ export default abstract class App implements IApp {
         }).catch((error : Error) : void => {
             throw error;
         });
+
+        mongoose.set('useFindAndModify', false);
     }
 
     public abstract initialize() : void;

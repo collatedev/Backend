@@ -7,6 +7,8 @@ import FetchRequestBuilder from '../../../src/HTTPRequestBuilder/FetchRequestBui
 import SecretGenerator from '../../../src/TwitchWatcher/Twitch/SecretGenerator';
 import TwitchUser from '../../../src/UserService/Models/TwitchUser';
 import ITwitchUser from '../../../src/UserService/Models/ITwitchUser';
+import IWebhookInfo from '../../../src/UserService/Models/IWebhookInfo';
+import Service from '../../../src/UserService/Models/Service';
 
 const OLD_ENV : any = process.env;
 
@@ -52,7 +54,8 @@ describe('subscribe', () => {
 			.mockReturnValueOnce(getAuthorizationResponse(StatusCodes.Accepted));
 
 		const twitch : ITwitch = new Twitch(new MockLogger());
-		await twitch.subscribe(new TwitchUser(1));
+		const webhooks : IWebhookInfo[] = await twitch.subscribe(new TwitchUser(1));
+		expectWebhooksToEqual(webhooks);
 	});
 
 	test('Should fail to send request due to bad request statuses', async () => {
@@ -69,7 +72,7 @@ describe('subscribe', () => {
 		await expect(twitch.subscribe(new TwitchUser(1))).rejects.toEqual(new Error(
 			`Failed to subscribe to {"hub.mode":"subscribe","hub.topic":"https://api.twitch.tv/` +
 			`helix/users/follows?first=1&to_id=1","hub.secret":"secret","hub.callba` +
-			`ck":"endpoint_url/follow/new","hub.lease_seconds":300}`
+			`ck":"endpoint_url/twitch/topic/follow/new","hub.lease_seconds":300}`
 		));
 	});
 
@@ -97,7 +100,8 @@ describe('unsubscribe', () => {
 			.mockReturnValueOnce(getAuthorizationResponse(StatusCodes.Accepted));
 
 		const twitch : ITwitch = new Twitch(new MockLogger());
-		await twitch.unsubscribe(new TwitchUser(1));
+		const webhooks : IWebhookInfo[] = await twitch.unsubscribe(new TwitchUser(1));
+		expectWebhooksToEqual(webhooks);
 	});
 
 	test('Should fail to send request due to bad request statuses', async () => {
@@ -114,7 +118,7 @@ describe('unsubscribe', () => {
 		await expect(twitch.unsubscribe(new TwitchUser(1))).rejects.toEqual(new Error(
 			`Failed to subscribe to {"hub.mode":"unsubscribe","hub.topic":"https://api.twitch.tv/` +
 			`helix/users/follows?first=1&to_id=1","hub.secret":"secret","hub.callba` +
-			`ck":"endpoint_url/follow/new","hub.lease_seconds":300}`
+			`ck":"endpoint_url/twitch/topic/follow/new","hub.lease_seconds":300}`
 		));
 	});
 
@@ -141,10 +145,6 @@ function getUserResponse() : Promise<Response> {
 	), { status : StatusCodes.OK }));
 }
 
-function getAuthorizationResponse(status: number) : Promise<Response> {
-	return Promise.resolve(new Response("", { status }));
-}
-
 function getBearerResponse(): Promise<Response> {
 	return Promise.resolve(new Response(JSON.stringify({
 		access_token: "asdfasdf",
@@ -153,4 +153,36 @@ function getBearerResponse(): Promise<Response> {
 	}), {
 		status: StatusCodes.OK
 	}));
+}
+
+function getAuthorizationResponse(status: number) : Promise<Response> {
+	return Promise.resolve(new Response("", { status }));
+}
+
+function expectWebhooksToEqual(webhooks : IWebhookInfo[]) : void {
+	if (webhooks.length === 0) {
+		fail();	
+	}
+	const index1 : number = 2;
+	const index2 : number = 3;
+
+	expect(webhooks[0].callbackURL).toEqual("endpoint_url/twitch/topic/follow/new");
+	expect(webhooks[0].topicURL).toEqual("https://api.twitch.tv/helix/users/follows?first=1&to_id=1");
+	expect(webhooks[0].expirationDate).toBeInstanceOf(Date);
+	expect(webhooks[0].service).toEqual(Service.Twitch);
+
+	expect(webhooks[1].callbackURL).toEqual("endpoint_url/twitch/topic/follow/followed");
+	expect(webhooks[1].topicURL).toEqual("https://api.twitch.tv/helix/users/follows?first=1&from_id=1");
+	expect(webhooks[1].expirationDate).toBeInstanceOf(Date);
+	expect(webhooks[1].service).toEqual(Service.Twitch);
+
+	expect(webhooks[index1].callbackURL).toEqual("endpoint_url/twitch/topic/streams");
+	expect(webhooks[index1].topicURL).toEqual("https://api.twitch.tv/helix/streams?user_id=1");
+	expect(webhooks[index1].expirationDate).toBeInstanceOf(Date);
+	expect(webhooks[index1].service).toEqual(Service.Twitch);
+	
+	expect(webhooks[index2].callbackURL).toEqual("endpoint_url/twitch/topic/user");
+	expect(webhooks[index2].topicURL).toEqual("https://api.twitch.tv/helix/users?id=1");
+	expect(webhooks[index2].expirationDate).toBeInstanceOf(Date);
+	expect(webhooks[index2].service).toEqual(Service.Twitch);
 }

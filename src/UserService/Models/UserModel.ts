@@ -1,5 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 import IUser from "./IUser";
+import IWebhookInfo from "./IWebhookInfo";
 
 const UserSchema : Schema = new Schema({
     twitchUser: {
@@ -20,5 +21,15 @@ const UserSchema : Schema = new Schema({
         default: []
     }
 });
+
+UserSchema.methods.addWebhook = async function(webhook : IWebhookInfo) : Promise<void> {
+    const currentContext : IUser = this as IUser;
+    currentContext.webhooks.push(webhook);
+    await currentContext.model('User').findByIdAndUpdate(currentContext.id, {
+        $set: {
+            webhooks: currentContext.webhooks
+        }
+    }).exec();
+};
 
 export default mongoose.model<IUser>('User', UserSchema);

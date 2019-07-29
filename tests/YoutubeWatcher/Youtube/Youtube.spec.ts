@@ -5,6 +5,8 @@ import { Response } from "node-fetch";
 import FetchRequestBuilder from "../../../src/HTTPRequestBuilder/FetchRequestBuilder";
 import YoutubeChannel from "../../../src/UserService/Models/YoutubeChannel";
 import FormData from "form-data";
+import IWebhookInfo from "../../../src/UserService/Models/IWebhookInfo";
+import Service from "../../../src/UserService/Models/Service";
 
 jest.mock("../../../src/HTTPRequestBuilder/FetchRequestBuilder");
 
@@ -97,9 +99,9 @@ describe("subscribeToPushNotifications", () => {
         process.env.YOUTUBE_API_KEY = "api_key";
         FetchRequestBuilder.prototype.makeRequest = jest.fn().mockReturnValueOnce(getVerificationResponse());
         const youtube : IYoutube = new Youtube();
-        const channel : IYoutubeChannel = getTestYoutubeChannel("test", "UCJU7oHhmt-EUa8KNfpuvDhA", "bar");
+        const channel : IYoutubeChannel = getTestYoutubeChannel("test", "id", "bar");
 
-        await youtube.subscribeToPushNotifications(channel);
+        const webhook : IWebhookInfo = await youtube.subscribeToPushNotifications(channel);
 
         expect(FetchRequestBuilder.prototype.makeRequest).toHaveBeenCalledWith(
             'https://pubsubhubbub.appspot.com/subscribe',
@@ -108,6 +110,10 @@ describe("subscribeToPushNotifications", () => {
                 body : expect.any(FormData)
             })
         );
+        expect(webhook.expirationDate).toBeInstanceOf(Date);
+        expect(webhook.service).toEqual(Service.Youtube);
+        expect(webhook.callbackURL).toEqual("endpoint_url/youtube");
+        expect(webhook.topicURL).toEqual("https://www.youtube.com/xml/feeds/videos.xml?channel_id=id");
     });
 
     test("It fails to subscribe to a channels push notifications", async () => {

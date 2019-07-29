@@ -6,6 +6,7 @@ import INewUserData from "./INewUserData";
 import IYoutube from "../../YoutubeWatcher/Youtube/IYoutube";
 import IYoutubeChannel from "../Models/IYoutubeChannel";
 import ITwitchUser from "../Models/ITwitchUser";
+import IWebhookInfo from "../Models/IWebhookInfo";
 
 export default class UserLayer implements IUserLayer {
     private twitch : ITwitch;
@@ -25,8 +26,14 @@ export default class UserLayer implements IUserLayer {
     }
 
     public async subscribe(user : IUser) : Promise<IUser> {
-        await this.twitch.subscribe(user.twitchUser);
-        await this.youtube.subscribeToPushNotifications(user.youtubeChannel);
+        const webhooks : IWebhookInfo[] = [];
+        webhooks.push(...await this.twitch.subscribe(user.twitchUser));
+        webhooks.push(await this.youtube.subscribeToPushNotifications(user.youtubeChannel));
+        
+        await Promise.all(webhooks.map(async (webhook : IWebhookInfo) : Promise<void> => {
+            return user.addWebhook(webhook);
+        }));
+
         return user;
 	}
 

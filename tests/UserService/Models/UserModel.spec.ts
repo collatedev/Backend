@@ -46,20 +46,44 @@ test("Should create a user with webhook info and find it", async () => {
     const twitchUser : ITwitchUser = new TwitchUser(0);
     const webhook : IWebhookInfo = new WebhookInfo(Service.Twitch, "test", "test");
     const user : IUser = await createUser(twitchUser, channel, [webhook]);
-    const result : IUser = await User.findById(user.id).exec() as IUser;
+    const foundUser : IUser = await User.findById(user.id).exec() as IUser;
 
-    expect(Array.from(result.webhooks)).toMatchObject([{
+    expect(Array.from(foundUser.webhooks)).toMatchObject([{
         expirationDate: expect.any(Date),
         topicURL: "test",
         callbackURL: "test",
         service: Service.Twitch
     }]);
-    expect(result.youtubeChannel).toMatchObject({
+    expect(foundUser.youtubeChannel).toMatchObject({
         channelName: "foo",
         title: "baz",
         youtubeID: "bar"
     });
-    expect(result.twitchUser).toMatchObject({
+    expect(foundUser.twitchUser).toMatchObject({
+        userID: 0
+    });
+});
+
+test("Should create a user and add a webhook to it", async () => {
+    const channel : IYoutubeChannel = createYoutubeChannel("foo", "bar", "baz");
+    const twitchUser : ITwitchUser = new TwitchUser(0);
+    const webhook : IWebhookInfo = new WebhookInfo(Service.Twitch, "test", "test");
+    const user : IUser = await createUser(twitchUser, channel);
+
+    await user.addWebhook(webhook);
+
+    expect(Array.from(user.webhooks)).toMatchObject([{
+        expirationDate: expect.any(Date),
+        topicURL: "test",
+        callbackURL: "test",
+        service: Service.Twitch
+    }]);
+    expect(user.youtubeChannel).toMatchObject({
+        channelName: "foo",
+        title: "baz",
+        youtubeID: "bar"
+    });
+    expect(user.twitchUser).toMatchObject({
         userID: 0
     });
 });

@@ -25,7 +25,8 @@
 		],
 		"max-line-length": [true, 120],
 		"semicolon": true,
-		"no-null-keyword": false
+		"no-null-keyword": false,
+		"only-arrow-functions": false
     },
     "rulesDirectory": []
 }
