@@ -8,8 +8,9 @@
         },
         "Params": {
             "userID": {
-                "type": "string",
-                "required": true
+                "type": "number",
+                "required": true,
+                "isInt": true
             }
         }
     }
