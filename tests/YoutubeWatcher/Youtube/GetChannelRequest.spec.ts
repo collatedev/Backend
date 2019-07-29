@@ -1,10 +1,10 @@
 import IYoutubeRequest from "../../../src/YoutubeWatcher/Youtube/IYoutubeRequest";
-import FetchRequestBuilder from "../../../src/TwitchWatcher/RequestBuilder/FetchRequestBuilder";
+import FetchRequestBuilder from "../../../src/HTTPRequestBuilder/FetchRequestBuilder";
 import StatusCodes from "../../../src/Router/StatusCodes";
 import { Response } from "node-fetch";
 import GetChannelRequest from "../../../src/YoutubeWatcher/Youtube/GetChannelRequest";
 
-jest.mock('../../../src/TwitchWatcher/RequestBuilder/FetchRequestBuilder');
+jest.mock('../../../src/HTTPRequestBuilder/FetchRequestBuilder');
 
 describe("send", () => {
     const OLD_ENV : any = process.env;

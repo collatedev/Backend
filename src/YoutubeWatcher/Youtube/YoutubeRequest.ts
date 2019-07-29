@@ -1,14 +1,14 @@
 import IYoutubeRequest from "./IYoutubeRequest";
 import { Response } from "node-fetch";
 import Path from "path";
-import IRequestBuilder from "../../TwitchWatcher/RequestBuilder/IRequestBuilder";
-import FetchRequestBuilder from "../../TwitchWatcher/RequestBuilder/FetchRequestBuilder";
+import IHTTPRequestBuilder from "../../HTTPRequestBuilder/IHTTPRequestBuilder";
+import FetchRequestBuilder from "../../HTTPRequestBuilder/FetchRequestBuilder";
 
 const YoutubeBaseAPIURL : string = "www.googleapis.com/youtube/v3/";
 
 export default abstract class YoutubeRequest implements IYoutubeRequest {
     private url : string;
-    private requestBuilder : IRequestBuilder;
+    private requestBuilder : IHTTPRequestBuilder;
 
     constructor(url : string) {
         this.url = `https://${Path.join(YoutubeBaseAPIURL, url)}`;

@@ -1,10 +1,10 @@
 import IYoutubeRequest from "../../../src/YoutubeWatcher/Youtube/IYoutubeRequest";
 import MockYoutubeRequest from "../../mocks/MockYoutubeRequest";
-import FetchRequestBuilder from "../../../src/TwitchWatcher/RequestBuilder/FetchRequestBuilder";
+import FetchRequestBuilder from "../../../src/HTTPRequestBuilder/FetchRequestBuilder";
 import StatusCodes from "../../../src/Router/StatusCodes";
 import { Response } from "node-fetch";
 
-jest.mock('../../../src/TwitchWatcher/RequestBuilder/FetchRequestBuilder');
+jest.mock('../../../src/HTTPRequestBuilder/FetchRequestBuilder');
 
 describe("send", () => {
     test("It should send a request to the correct url", async () => {

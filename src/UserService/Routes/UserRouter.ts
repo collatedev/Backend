@@ -6,7 +6,7 @@ import ILogger from "../../Logging/ILogger";
 import IValidationSchema from "../../RequestValidator/ValidationSchema/IValidationSchema";
 import ValidationSchema from "../../RequestValidator/ValidationSchema/ValidationSchema";
 import StatusCodes from "../../Router/StatusCodes";
-import IUser from "../models/IUser";
+import IUser from "../Models/IUser";
 
 const InsecureSchema : IValidationSchema = new ValidationSchema({
     "types": {
@@ -51,14 +51,14 @@ export default class UserRouter extends Router {
 	}
 
 	public async handleGetUserByID(request: Request, response: Response) : Promise<void> {
-		await this.getUserByID(response, parseInt(request.params.userID, 10));
+		await this.getUserByID(response, request.params.userID);
 	}
 
-	private async getUserByID(response: Response, userID: number) : Promise<void> {
+	private async getUserByID(response: Response, userID: string) : Promise<void> {
 		try {
 			const user : IUser = await this.userLayer.getUserInfo(userID);
-			this.logger.info(`Successfully got user: ${JSON.stringify(user)}`);
-			this.sendData(response, user, StatusCodes.OK);
+			this.logger.info(`Successfully got user: ${JSON.stringify(user.toJSON())}`);
+			this.sendData(response, user.toJSON(), StatusCodes.OK);
 		} catch (error) {
 			this.logger.error(error);
 			this.sendError(response, `Failed to get user with id: ${userID}`, StatusCodes.NotFound);
@@ -70,9 +70,8 @@ export default class UserRouter extends Router {
 		try {
 			await this.userLayer.subscribe(user);
 		} catch (error) {
-			await this.userLayer.deleteUser(user.getID());
 			this.sendError(response, "Failed to subscribe user to webhooks", StatusCodes.BadRequest);
 		}
-		return this.sendData(response, user, StatusCodes.OK);
+		return this.sendData(response, user.toJSON(), StatusCodes.OK);
 	}
 }

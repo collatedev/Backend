@@ -6,6 +6,7 @@ import IApp from "./IApp";
 import ILogger from "../Logging/ILogger";
 import IService from "../Service/IService";
 import IRouter from "../Router/IRouter";
+import mongoose from "mongoose";
 
 export default abstract class App implements IApp {
     public app: Express.Application;
@@ -27,6 +28,14 @@ export default abstract class App implements IApp {
             },
         };
         this.app.use(morgan('combined', { stream: streamOptions }));
+
+        mongoose.connect(process.env.MONGO_DB_CONNECTION_STRING as string, {
+            useNewUrlParser: true
+        }).then(() : void => {
+            logger.info("connected to mongo");
+        }).catch((error : Error) : void => {
+            throw error;
+        });
     }
 
     public abstract initialize() : void;

@@ -4,40 +4,50 @@ import TwitchSubscription from './TwitchSubscription';
 import TwitchTopics from "./TwitchTopics";
 import ITwitchRequest from "./ITwitchRequest";
 import ITwitchResponse from "./ITwitchResponse";
-import ITwitchService from "./ITwitchService";
+import ITwitch from "./ITwitch";
 import ILogger from "../../Logging/ILogger";
 import StatusCodes from "../../Router/StatusCodes";
 import WebhookCallbackURL from '../../DeveloperTools/WebhookCallbackURL';
+import ITwitchUser from '../../UserService/Models/ITwitchUser';
+import GetUserRequest from './GetUserRequest';
+import TwitchUser from '../../UserService/Models/TwitchUser';
 
 type PendingTwitchResponse = Promise<ITwitchResponse>;
 
-export default class TwitchService implements ITwitchService {
+export default class Twitch implements ITwitch {
 	private logger : ILogger;
 
 	constructor(logger : ILogger) {
 		this.logger = logger;
 	}
 
-	public async subscribe(userID : number) : Promise<void> {
+	public async getUser(userName : string) : Promise<ITwitchUser> {
+		const getUserRequest : ITwitchRequest = new GetUserRequest(userName);
+		const response : ITwitchResponse = await getUserRequest.send();
+		const payload : any = await response.response().json();
+		return new TwitchUser(payload.data[0].id);
+	}
+
+	public async subscribe(user : ITwitchUser) : Promise<void> {
 		try {
 			const callbackURL : string = await WebhookCallbackURL.getCallbackURL("twitch/topic");
-			const requests : SubscribeRequest[] = this.getSubscribeRequests(userID, callbackURL);
-			await this.makeRequests(requests);
+			const requests : SubscribeRequest[] = this.getSubscribeRequests(user.userID, callbackURL);
+			await this.makeWebhookRequests(requests);
 			this.logger.info(
-				`Successfully completed Twich subscription requests to all topics for user (id=${userID}) to all webhooks`
+				`Successfully completed Twich subscription requests to all topics for user (id=${user}) to all webhooks`
 			);	
 		} catch (error) {
 			throw error;
 		}
 	}
 
-	public async unsubscribe(userID: number) : Promise<void> {
+	public async unsubscribe(user: ITwitchUser) : Promise<void> {
 		try {
 			const callbackURL : string = await WebhookCallbackURL.getCallbackURL("/twitch/topic");
-			const requests : UnsubscribeRequest[] = this.getUnsubscribeRequests(userID, callbackURL);
-			await this.makeRequests(requests);
+			const requests : UnsubscribeRequest[] = this.getUnsubscribeRequests(user.userID, callbackURL);
+			await this.makeWebhookRequests(requests);
 			this.logger.info(
-				`Successfully completed Twich subscription requests to all topics for user (id=${userID}) to all webhooks`
+				`Successfully completed Twich subscription requests to all topics for user (id=${user}) to all webhooks`
 			);	
 		} catch (error) {
 			throw error;
@@ -61,13 +71,13 @@ export default class TwitchService implements ITwitchService {
 	}
 
 
-	private async makeRequests(requests: ITwitchRequest[]) : Promise<void> {
-		const messages : PendingTwitchResponse[] = this.sendRequests(requests);	
+	private async makeWebhookRequests(requests: ITwitchRequest[]) : Promise<void> {
+		const messages : PendingTwitchResponse[] = this.sendWebhookRequests(requests);	
 		const responses : ITwitchResponse[] = await Promise.all(messages);
-		this.validateResponses(responses);
+		this.validateWebhookResponses(responses);
 	}
 
-	private validateResponses(responses: ITwitchResponse[]) : void {
+	private validateWebhookResponses(responses: ITwitchResponse[]) : void {
 		for (const response of responses) {
 			if (response.response().status !== StatusCodes.Accepted) {
 				throw new Error(`Failed to subscribe to ${response.request().body}`);
@@ -75,7 +85,7 @@ export default class TwitchService implements ITwitchService {
 		}
 	}
 
-	private sendRequests(requests: ITwitchRequest[]) : PendingTwitchResponse[] {
+	private sendWebhookRequests(requests: ITwitchRequest[]) : PendingTwitchResponse[] {
 		const messages : PendingTwitchResponse[] = [];
 		for (const request of requests) {
 			messages.push(request.send());

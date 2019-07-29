@@ -66,4 +66,12 @@ export default class TwitchWebhookRequestBody implements ITwitchWebhookRequestBo
 			"hub.lease_seconds": this["hub.lease_seconds"]
 		});
 	}
+
+	public getURL() : string {
+		return "https://api.twitch.tv/helix/webhooks/hub";
+	}
+
+	public getMethod() : string {
+		return "POST";
+	}
 }	
