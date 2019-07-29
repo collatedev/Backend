@@ -132,6 +132,26 @@ test('It should create a field configuration with a range parameter', () => {
     expect(configuration.range[1]).toEqual(1);
 });
 
+test('It should fail to create a field configuration due to isInt being the wrong type', () => {
+    expect(createField({
+        type: "number",
+        required: true,
+        isInt: ["1", "1"]
+    })).toThrow(
+        new IllegalSchemaError('The key "isInt" must be a boolean')
+    );
+});
+
+test('It should fail to create a field configuration due to isInt being used on the wrong type', () => {
+    expect(createField({
+        type: "string",
+        required: true,
+        isInt: true
+    })).toThrow(
+        new IllegalSchemaError('The key "isInt" can only be used when the type is \'number\' or an array of \'number\'')
+    );
+});
+
 test('It should fail to create a field configuration because values can only be used when the type is an enum', () => {
     expect(createField({
         type: "string",

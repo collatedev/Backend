@@ -1,9 +1,11 @@
 import IFieldConfiguration from "./IFieldConfiguration";
 import IllegalSchemaError from "./IllegalSchemaError";
+import IsType from "../Types/IsType";
 
 const RangeLength : number = 2;
 const ValidKeys : string[] = [
-    "required", "type", "values", "range", "isURL", "startsWith", "length", "arrayLengths"
+    "required", "type", "values", "range", "isURL", "startsWith", "length", "arrayLengths",
+    "isInt"
 ];
 
 export default class FieldConfiguration implements IFieldConfiguration {
@@ -15,6 +17,7 @@ export default class FieldConfiguration implements IFieldConfiguration {
     public readonly startsWith? : string | undefined;
     public readonly length? : number | undefined;
     public readonly arrayLengths? : number[] | undefined;
+    public readonly isInt? : boolean | undefined;
 
     constructor(field : any) {
         this.validateField(field);
@@ -24,6 +27,7 @@ export default class FieldConfiguration implements IFieldConfiguration {
         this.required = field.required;
         this.type = field.type;
         this.range = this.getRange(field);
+        this.isInt = this.getIsInt(field);
         this.values = this.getValues(field);
         this.isURL = this.getIsURL(field);
         this.startsWith = this.getStartsWith(field);
@@ -87,6 +91,21 @@ export default class FieldConfiguration implements IFieldConfiguration {
                 throw new IllegalSchemaError('The values in the "range" array must be numbers');
             }
             return field.range as number[];
+        }
+        return undefined;
+    }
+
+    private getIsInt(field : any) : boolean | undefined {
+        if (field.hasOwnProperty("isInt")) {
+            if (this.type !== "number" && !this.isArrayOf("number")) {
+                throw new IllegalSchemaError(
+                    'The key "isInt" can only be used when the type is \'number\' or an array of \'number\''
+                );
+            }
+            if (!IsType.isTypeOf("boolean", field.isInt)) {
+                throw new IllegalSchemaError('The key "isInt" must be a boolean');
+            }
+            return field.isInt as boolean;
         }
         return undefined;
     }

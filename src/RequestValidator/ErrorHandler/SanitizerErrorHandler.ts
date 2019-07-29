@@ -34,6 +34,9 @@ export default class SanitizerErrorHandler extends ErrorHandler {
                     ` when it should be ${values[expectedArrayLengthIndex]}`
                 );
                 break;
+            case ErrorType.NonIntValueError: 
+                this.addError(`The value '${values[0]}' must be an int`);
+                break;
             default:
                 throw new TypeError(`Unknown error type ${type}`);
         }

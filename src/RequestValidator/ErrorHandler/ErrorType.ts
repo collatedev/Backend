@@ -10,6 +10,7 @@ enum ErrorType {
     DoesNotStartWithError,
     IllegalLengthError,
     IllegalArrayLength,
+    NonIntValueError
 }
 
 export default ErrorType;

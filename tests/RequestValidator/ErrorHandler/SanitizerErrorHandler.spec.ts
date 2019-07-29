@@ -28,6 +28,19 @@ test("Handles a range error", () => {
     }]);
 });
 
+test("Handles a isInt error", () => {
+    const errorHandler : IErrorHandler = new SanitizerErrorHandler(new PathBuilder());
+    const value : number = 2.1;
+
+    errorHandler.handleError([value], ErrorType.NonIntValueError);
+
+    expect(errorHandler.hasErrors()).toBeTruthy();
+    expect(errorHandler.getErrors()).toEqual([{
+        message: "The value '2.1' must be an int",
+        location: ""
+    }]);
+});
+
 test("Handles a isURL error", () => {
     const errorHandler : IErrorHandler = new SanitizerErrorHandler(new PathBuilder());
 
