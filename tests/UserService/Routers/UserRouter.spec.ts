@@ -49,7 +49,7 @@ describe("validate() [middleware]", () => {
                 },
                 {
                     location: "params.userID",
-                    message: "Value 'asdf' must be an int",
+                    message: "The value 'asdf' must be an int",
                 }
             ])
         );
