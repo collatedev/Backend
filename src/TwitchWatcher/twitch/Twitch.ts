@@ -27,6 +27,9 @@ export default class Twitch implements ITwitch {
 		const getUserRequest : ITwitchRequest = new GetUserRequest(userName);
 		const response : ITwitchResponse = await getUserRequest.send();
 		const payload : any = await response.response().json();
+		if (payload.data.length === 0) {
+			throw new Error(`Could not find user with login "${userName}"`);
+		}
 		return new TwitchUser(payload.data[0].id);
 	}
 

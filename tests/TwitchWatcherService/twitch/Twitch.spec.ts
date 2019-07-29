@@ -24,12 +24,20 @@ afterEach(() => {
 });
 
 describe('getUser', () => {
-	test('Should fail to get user', async () => {
+	test('Should fail to get user due to bad request', async () => {
 		const twitch : ITwitch = new Twitch(new MockLogger());
 		FetchRequestBuilder.prototype.makeRequest = jest.fn()
 			.mockReturnValue(getRequestFailedResponse());
 
 		await expect(twitch.getUser("foo")).rejects.toThrow(new Error("Request failed"));
+	});
+
+	test('Should fail to get user due to empty payload', async () => {
+		const twitch : ITwitch = new Twitch(new MockLogger());
+		FetchRequestBuilder.prototype.makeRequest = jest.fn()
+			.mockReturnValue(getEmptyUserResponse());
+
+		await expect(twitch.getUser("foo")).rejects.toThrow(new Error("Could not find user with login \"foo\""));
 	});
 
 	test('Should get user', async () => {
@@ -137,6 +145,12 @@ describe('unsubscribe', () => {
 
 function getRequestFailedResponse() : Promise<Response> {
 	return Promise.reject(new Error("Request failed"));
+}
+
+function getEmptyUserResponse() : Promise<Response> {
+	return Promise.resolve(new Response(JSON.stringify({ 
+		data: []}
+	), { status : StatusCodes.OK }));
 }
 
 function getUserResponse() : Promise<Response> {

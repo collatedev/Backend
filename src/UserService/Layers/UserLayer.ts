@@ -30,7 +30,7 @@ export default class UserLayer implements IUserLayer {
         webhooks.push(...await this.twitch.subscribe(user.twitchUser));
         webhooks.push(await this.youtube.subscribeToPushNotifications(user.youtubeChannel));
         
-        await Promise.all(webhooks.map(async (webhook : IWebhookInfo) : Promise<void> => {
+        await Promise.all(webhooks.map((webhook : IWebhookInfo) : Promise<void> => {
             return user.addWebhook(webhook);
         }));
 
