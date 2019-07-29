@@ -18,6 +18,8 @@ import Youtube from '../../../src/YoutubeWatcher/Youtube/Youtube';
 import Twitch from '../../../src/TwitchWatcher/Twitch/Twitch';
 import IYoutubeChannel from '../../../src/UserService/Models/IYoutubeChannel';
 import YoutubeChannel from '../../../src/UserService/Models/YoutubeChannel';
+import ITwitchUser from '../../../src/UserService/Models/ITwitchUser';
+import TwitchUser from '../../../src/UserService/Models/TwitchUser';
 
 jest.mock('../../../src/YoutubeWatcher/Youtube/Youtube');
 jest.mock('../../../src/TwitchWatcher/Twitch/Twitch');
@@ -31,7 +33,7 @@ describe("validate() [middleware]", () => {
 	test('Should fail to validate due to incorrect type', () => { 
 		const request : any = mockRequest({
             params: {
-                userID: 1
+                userID: "asdf"
             }
         });
 		const response : any = mockResponse();
@@ -43,13 +45,36 @@ describe("validate() [middleware]", () => {
             new ErrorMessage([
                 {
                     location: "params.userID",
-                    message: "Property 'userID' should be type 'string'",
+                    message: "Property 'userID' should be type 'number'",
+                },
+                {
+                    location: "params.userID",
+                    message: "Value 'asdf' must be an int",
                 }
             ])
         );
     });
     
-    test.todo('Should fail due to a float userID [TODO]');
+    test('Should fail due to a float userID', () => {
+        const request : any = mockRequest({
+            params: {
+                userID: 1.1
+            }
+        });
+		const response : any = mockResponse();
+	
+		const middleWare : IRouteHandler = validate(new ValidationSchema(GetUserRequestSchema));
+        middleWare(request, response);
+        expect(response.status).toHaveBeenCalledWith(StatusCodes.BadRequest);
+        expect(response.json).toHaveBeenCalledWith(
+            new ErrorMessage([
+                {
+                    location: "params.userID",
+                    message: "The value '1.1' must be an int",
+                }
+            ])
+        );
+    });
 });
 
 describe('handleGetUserByID()', () => {
@@ -74,10 +99,11 @@ describe('handleGetUserByID()', () => {
 
     test('Should get user data', async () => {
         const channel : IYoutubeChannel = createYoutubeChannel("foo", "bar", "baz");
+        const twitchUser : ITwitchUser = new TwitchUser(1);
         UserLayer.prototype.getUserInfo = jest.fn().mockReturnValue(
-            Promise.resolve(createUser(1, channel))
+            Promise.resolve(createUser(twitchUser, channel))
         );
-        const user : IUser = createUser(1, channel);
+        const user : IUser = createUser(twitchUser, channel);
         const request : any = mockRequest({
             params: {
                 userID: user.id
@@ -92,10 +118,10 @@ describe('handleGetUserByID()', () => {
     });
 });
 
-function createUser(twitchID : number, channel : IYoutubeChannel) : IUser {
+function createUser(twitchUser : ITwitchUser, youtubeChannel : IYoutubeChannel) : IUser {
     return new UserModel({
-        twitchID,
-        youtubeChannel: channel
+        twitchUser,
+        youtubeChannel
     });
 } 
 
