@@ -41,6 +41,26 @@ test("Should find and create a user", async () => {
     });
 });
 
+test("Should find by youtube channelID and create a user", async () => {
+    const channel : IYoutubeChannel = createYoutubeChannel("foo", "bar", "baz");
+    const twitchUser : ITwitchUser = new TwitchUser(0);
+    await createUser(twitchUser, channel);
+
+    const result : IUser = await User.findOne({
+        "youtubeChannel.youtubeID": "bar"
+    }).exec() as IUser;
+
+    expect(Array.from(result.webhooks)).toEqual([]);
+    expect(result.youtubeChannel).toMatchObject({
+        channelName: "foo",
+        title: "baz",
+        youtubeID: "bar"
+    });
+    expect(result.twitchUser).toMatchObject({
+        userID: 0
+    });
+});
+
 test("Should create a user with webhook info and find it", async () => {
     const channel : IYoutubeChannel = createYoutubeChannel("foo", "bar", "baz");
     const twitchUser : ITwitchUser = new TwitchUser(0);

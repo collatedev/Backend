@@ -14,6 +14,11 @@ import ICreatedVideoNotification from "../../../src/Notification/Youtube/ICreate
 import CreatedVideoNotification from "../../../src/Notification/Youtube/CreatedVideoNotification";
 import NotificationType from "../../../src/Notification/NotificationType";
 import UserModel from "../../../src/UserService/Models/UserModel";
+import TwitchUser from "../../../src/UserService/Models/TwitchUser";
+import IUser from "../../../src/UserService/Models/IUser";
+import ITwitchUser from "../../../src/UserService/Models/ITwitchUser";
+import YoutubeChannel from "../../../src/UserService/Models/YoutubeChannel";
+import IYoutubeChannel from "../../../src/UserService/Models/IYoutubeChannel";
 
 const schema : IValidationSchema = new ValidationSchema(WebhookSchema);
 const router : CallbackRouter = new CallbackRouter(new MockLogger());
@@ -171,7 +176,7 @@ afterEach(async () => {
 
 describe("handleCallback", () => {
     test("Saves notification to database", async() => {
-        MockFindUser("fromUserID", "channelID");
+        await createUser(new TwitchUser(0), createYoutubeChannel("foo", "channelID", "bar"));
         const request : any = mockRequest({
 			body: getCreateVideoBody()
 		});
@@ -184,7 +189,7 @@ describe("handleCallback", () => {
         expect(notification.channelID).toEqual("channelID");
         expect(notification.createdAt).toBeInstanceOf(Date);
         expect(notification.datePublished).toEqual(new Date(1));
-        expect(notification.fromUserID).toEqual("fromUserID");
+        expect(typeof notification.fromUserID).toEqual("string");
         expect(notification.link).toEqual("link");
         expect(notification.title).toEqual("title");
         expect(notification.type).toEqual(NotificationType.Youtube.CreateVideo);
@@ -192,6 +197,7 @@ describe("handleCallback", () => {
     });
 
     test("Fails to query db", async() => {
+        const prop : any = UserModel.findOne;
         UserModel.findOne = jest.fn().mockReturnValueOnce({
             exec: async () : Promise<any> => {
                 return Promise.reject(new Error("Failed to query db"));
@@ -203,14 +209,10 @@ describe("handleCallback", () => {
         const response : any = MockResponse();
 
         await expect(router.handleCallback(request, response)).rejects.toThrow(new Error("Failed to query db"));
+        UserModel.findOne = prop;
     });
 
     test("Does not find user", async() => {
-        UserModel.findOne = jest.fn().mockReturnValueOnce({
-            exec: async () : Promise<any> => {
-                return Promise.resolve(null);
-            }
-        });
         const request : any = mockRequest({
 			body: getCreateVideoBody()
 		});
@@ -221,19 +223,24 @@ describe("handleCallback", () => {
     });
 });
 
-function MockFindUser(id : string, channelID : string) : void {
-    UserModel.findOne = jest.fn().mockReturnValueOnce({
-        exec: async () : Promise<any> => {
-            return Promise.resolve({
-                id,
-                youtubeChannel: {
-                    channelID
-                }
-            });
-        }
+function createYoutubeChannel(name : string, id: string, title : string) : IYoutubeChannel {
+    return new YoutubeChannel(name, {
+        items: [{ 
+            id,
+            snippet: {
+                title
+            }
+        }]
     });
 }
 
+async function createUser(twitchUser : ITwitchUser, youtubeChannel : IYoutubeChannel) : Promise<IUser> {
+    const user : IUser = new UserModel({
+        twitchUser,
+        youtubeChannel
+    });
+    return user.save();
+} 
 function getCreateVideoBody() : any {
     return {
         "feed": {

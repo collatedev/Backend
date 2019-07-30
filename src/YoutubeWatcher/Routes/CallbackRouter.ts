@@ -58,15 +58,15 @@ export default class CallbackRouter extends Router implements ICallbackRouter {
     public async handleCallback(request : Request, response : Response) : Promise<void> {
         this.logger.info(`recieved body: ${JSON.stringify(request.body)}`);
         const user : IUser | null = await UserModel.findOne({
-            youtubeChannel: {
-                id: request.body.feed.entry[0]["yt:channelid"][0]
-            }
+            "youtubeChannel.youtubeID": request.body.feed.entry[0]["yt:channelid"][0]
         }).exec();
+
         if (user === null) {
             throw new Error(
                 `Failed to find user with channelID: "${request.body.feed.entry[0]["yt:channelid"][0]}"`
             );
         }
+
         const notification : ICreatedVideoNotification = new CreatedVideoNotification({
             type: NotificationType.Youtube.CreateVideo,
             channelID: request.body.feed.entry[0]["yt:channelid"][0],
