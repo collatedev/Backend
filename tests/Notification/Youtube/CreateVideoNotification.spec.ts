@@ -61,4 +61,5 @@ test("finds a notification", async () => {
     expect(notification.datePublished).toEqual(new Date(1));
     expect(notification.fromUserID).toEqual("fromUserID");
     expect(notification.link).toEqual("link");
+    expect(notification.createdAt).toBeInstanceOf(Date);
 });

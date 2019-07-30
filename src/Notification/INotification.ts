@@ -2,6 +2,6 @@ import { Document } from "mongoose";
 
 export default interface INotification extends Document {
     type : string;
-    fromUserID : String;
+    fromUserID : string;
     createdAt : Date;
 }

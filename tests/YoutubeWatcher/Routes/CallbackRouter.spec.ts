@@ -9,6 +9,11 @@ import ValidationSchema from "../../../src/RequestValidator/ValidationSchema/Val
 import WebhookSchema from "../../../src/RequestSchemas/WebhookChallengeRequest.json";
 import ErrorMessage from "../../../src/Router/Messages/ErrorMessage";
 import validate from "../../../src/Router/Middleware/Validate";
+import MockDB from "../../mocks/MockDB";
+import ICreatedVideoNotification from "../../../src/Notification/Youtube/ICreatedVideoNotification";
+import CreatedVideoNotification from "../../../src/Notification/Youtube/CreatedVideoNotification";
+import NotificationType from "../../../src/Notification/NotificationType";
+import UserModel from "../../../src/UserService/Models/UserModel";
 
 const schema : IValidationSchema = new ValidationSchema(WebhookSchema);
 const router : CallbackRouter = new CallbackRouter(new MockLogger());
@@ -149,3 +154,153 @@ describe("handleChallenge", () => {
 		expect(response.send).toHaveBeenCalledWith("challenge_token");
     });
 });
+
+const db : MockDB = new MockDB();
+
+beforeAll(async () => {
+    await db.start();
+});
+
+afterAll(async () => {
+    await db.stop();
+});
+
+afterEach(async () => {
+    await db.cleanup();
+});
+
+describe("handleCallback", () => {
+    test("Saves notification to database", async() => {
+        MockFindUser("fromUserID", "channelID");
+        const request : any = mockRequest({
+			body: getCreateVideoBody()
+		});
+        const response : any = MockResponse();
+
+        await router.handleCallback(request, response);
+
+        const notification : ICreatedVideoNotification = (await CreatedVideoNotification.find().exec())[0];
+
+        expect(notification.channelID).toEqual("channelID");
+        expect(notification.createdAt).toBeInstanceOf(Date);
+        expect(notification.datePublished).toEqual(new Date(1));
+        expect(notification.fromUserID).toEqual("fromUserID");
+        expect(notification.link).toEqual("link");
+        expect(notification.title).toEqual("title");
+        expect(notification.type).toEqual(NotificationType.Youtube.CreateVideo);
+        expect(notification.videoID).toEqual("videoID");
+    });
+
+    test("Fails to query db", async() => {
+        UserModel.findOne = jest.fn().mockReturnValueOnce({
+            exec: async () : Promise<any> => {
+                return Promise.reject(new Error("Failed to query db"));
+            }
+        });
+        const request : any = mockRequest({
+			body: getCreateVideoBody()
+		});
+        const response : any = MockResponse();
+
+        await expect(router.handleCallback(request, response)).rejects.toThrow(new Error("Failed to query db"));
+    });
+
+    test("Does not find user", async() => {
+        UserModel.findOne = jest.fn().mockReturnValueOnce({
+            exec: async () : Promise<any> => {
+                return Promise.resolve(null);
+            }
+        });
+        const request : any = mockRequest({
+			body: getCreateVideoBody()
+		});
+        const response : any = MockResponse();
+
+        await expect(router.handleCallback(request, response))
+            .rejects.toThrow(new Error("Failed to find user with channelID: \"channelID\""));
+    });
+});
+
+function MockFindUser(id : string, channelID : string) : void {
+    UserModel.findOne = jest.fn().mockReturnValueOnce({
+        exec: async () : Promise<any> => {
+            return Promise.resolve({
+                id,
+                youtubeChannel: {
+                    channelID
+                }
+            });
+        }
+    });
+}
+
+function getCreateVideoBody() : any {
+    return {
+        "feed": {
+            "$": {
+                "xmlns:yt": "http://www.youtube.com/xml/schemas/2015",
+                "xmlns": "http://www.w3.org/2005/Atom"
+            },
+            "link": [
+                {
+                    "$": {
+                        "rel": "hub",
+                        "href": "https://pubsubhubbub.appspot.com"
+                    }
+                },
+                {
+                    "$": {
+                        "rel": "self",
+                        "href": "https://www.youtube.com/xml/feeds/videos.xml?channel_id=UCJU7oHhmt-EUa8KNfpuvDhA"
+                    }
+                }
+            ],
+            "title": [
+                "YouTube video feed"
+            ],
+            "updated": [
+                "2019-07-30T08:07:48.581684321+00:00"
+            ],
+            "entry": [
+                {
+                    "id": [
+                        "yt:video:WbzYmskEgDE"
+                    ],
+                    "yt:videoid": [
+                        "videoID"
+                    ],
+                    "yt:channelid": [
+                        "channelID"
+                    ],
+                    "title": [
+                        "title"
+                    ],
+                    "link": [
+                        {
+                            "$": {
+                                "rel": "alternate",
+                                "href": "link"
+                            }
+                        }
+                    ],
+                    "author": [
+                        {
+                            "name": [
+                                "Evan Coulson"
+                            ],
+                            "uri": [
+                                "https://www.youtube.com/channel/UCJU7oHhmt-EUa8KNfpuvDhA"
+                            ]
+                        }
+                    ],
+                    "published": [
+                        "1970-01-01T00:00:00.001Z"
+                    ],
+                    "updated": [
+                        "2019-07-30T08:07:48.581684321+00:00"
+                    ]
+                }
+            ]
+        }
+    };
+}
