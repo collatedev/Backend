@@ -62,9 +62,11 @@ export default class CallbackRouter extends Router implements ICallbackRouter {
         }).exec();
 
         if (user === null) {
-            throw new Error(
+            this.logger.error(
                 `Failed to find user with channelID: "${request.body.feed.entry[0]["yt:channelid"][0]}"`
             );
+            response.send().status(StatusCodes.InternalError);
+            return;
         }
 
         const notification : ICreatedVideoNotification = new CreatedVideoNotification({
@@ -77,6 +79,7 @@ export default class CallbackRouter extends Router implements ICallbackRouter {
             videoID: request.body.feed.entry[0]["yt:videoid"][0]
         });
         await notification.save();
+        response.send().status(StatusCodes.OK);
     }
 }
 

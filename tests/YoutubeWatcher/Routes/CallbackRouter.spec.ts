@@ -194,6 +194,7 @@ describe("handleCallback", () => {
         expect(notification.title).toEqual("title");
         expect(notification.type).toEqual(NotificationType.Youtube.CreateVideo);
         expect(notification.videoID).toEqual("videoID");
+        expect(response.status).toHaveBeenCalledWith(StatusCodes.OK);
     });
 
     test("Fails to query db", async() => {
@@ -218,8 +219,9 @@ describe("handleCallback", () => {
 		});
         const response : any = MockResponse();
 
-        await expect(router.handleCallback(request, response))
-            .rejects.toThrow(new Error("Failed to find user with channelID: \"channelID\""));
+        await router.handleCallback(request, response);
+
+        expect(response.status).toHaveBeenCalledWith(StatusCodes.InternalError);
     });
 });
 
