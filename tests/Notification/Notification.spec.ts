@@ -1,5 +1,5 @@
 import MockDB from "../mocks/MockDB";
-import NotificationSchema from "../../src/Notification/NotificationSchema";
+import NotificationSchema from "../../src/Notification/Notification";
 import INotification from "../../src/Notification/INotification";
 import NotificationType from "../../src/Notification/NotificationType";
 
@@ -37,13 +37,10 @@ test("It should create and find notificiation", async () => {
     });
     await notification.save();
 
-    const foundNotification : INotification | null = await NotificationSchema.findById(notification.id).exec();
+    const foundNotification : INotification = 
+        await NotificationSchema.findById(notification.id).exec() as INotification;
     
-    if (foundNotification === null) {
-        fail("Did not find notification");
-    } else {
-        expect(foundNotification.type).toEqual("Youtube:CreateVideo");
-            expect(foundNotification.createdAt).toBeInstanceOf(Date);
-        expect(foundNotification.fromUserID).toEqual("foo");
-    }
+    expect(foundNotification.type).toEqual("Youtube:CreateVideo");
+    expect(foundNotification.createdAt).toBeInstanceOf(Date);
+    expect(foundNotification.fromUserID).toEqual("foo");
 });
