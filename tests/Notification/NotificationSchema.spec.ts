@@ -43,7 +43,7 @@ test("It should create and find notificiation", async () => {
         fail("Did not find notification");
     } else {
         expect(foundNotification.type).toEqual("Youtube:CreateVideo");
-        expect(foundNotification.createdAt).toBeInstanceOf(Date);
+            expect(foundNotification.createdAt).toBeInstanceOf(Date);
         expect(foundNotification.fromUserID).toEqual("foo");
     }
 });
