@@ -10,4 +10,8 @@ const NotificationSchema : Schema = new Schema({
     }
 });
 
+NotificationSchema.methods.isDuplicate = function() : Promise<boolean> {
+    return Promise.reject(Error("Abstract method can not be called"));
+};
+
 export default model<INotification>('Notification', NotificationSchema);

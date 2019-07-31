@@ -44,3 +44,12 @@ test("It should create and find notificiation", async () => {
     expect(foundNotification.createdAt).toBeInstanceOf(Date);
     expect(foundNotification.fromUserID).toEqual("foo");
 });
+
+test("It should fail to call is duplicate", async () => {
+    const notification : INotification = new NotificationSchema({
+        type: NotificationType.Youtube.CreateVideo,
+        fromUserID: "foo"
+    });
+    
+    await expect(notification.isDuplicate()).rejects.toThrowError("Abstract method can not be called");
+});

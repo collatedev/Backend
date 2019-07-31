@@ -63,3 +63,56 @@ test("finds a notification", async () => {
     expect(notification.link).toEqual("link");
     expect(notification.createdAt).toBeInstanceOf(Date);
 });
+
+test("that the notification is not a duplicate", async () => {
+    const created : ICreatedVideoNotification = new CreatedVideoNotification({
+        type: NotificationType.Youtube.CreateVideo,
+        title: "title",
+        videoID: "videoID",
+        channelID: "channelID",
+        datePublished: new Date(1),
+        fromUserID: "fromUserID",
+        link: "link"
+    });
+    
+    expect(await created.isDuplicate()).toBeFalsy();
+});
+
+test("that the notification is not a duplicate", async () => {
+    const created : ICreatedVideoNotification = new CreatedVideoNotification({
+        type: NotificationType.Youtube.CreateVideo,
+        title: "title",
+        videoID: "videoID",
+        channelID: "channelID",
+        datePublished: new Date(1),
+        fromUserID: "fromUserID",
+        link: "link"
+    });
+    await created.save();
+    
+    expect(await created.isDuplicate()).toBeFalsy();
+});
+
+test("that the notification is a duplicate", async () => {
+    const created1 : ICreatedVideoNotification = new CreatedVideoNotification({
+        type: NotificationType.Youtube.CreateVideo,
+        title: "title",
+        videoID: "videoID",
+        channelID: "channelID",
+        datePublished: new Date(1),
+        fromUserID: "fromUserID",
+        link: "link"
+    });
+    const created2 : ICreatedVideoNotification = new CreatedVideoNotification({
+        type: NotificationType.Youtube.CreateVideo,
+        title: "title",
+        videoID: "videoID",
+        channelID: "channelID",
+        datePublished: new Date(1),
+        fromUserID: "fromUserID",
+        link: "link"
+    });
+    await created1.save();
+    
+    expect(await created2.isDuplicate()).toBeTruthy();
+});

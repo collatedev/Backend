@@ -1,5 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 import IUser from "./IUser";
+import IUserModel from "./IUserModel";
 import IWebhookInfo from "./IWebhookInfo";
 
 const UserSchema : Schema = new Schema({
@@ -32,4 +33,11 @@ UserSchema.methods.addWebhook = async function(webhook : IWebhookInfo) : Promise
     }).exec();
 };
 
-export default mongoose.model<IUser>('User', UserSchema);
+UserSchema.statics.findUserByYoutubeID = async function(channelID : string) : Promise<IUser | null> {
+    const currentContext : IUserModel = this as IUserModel;
+    return currentContext.findOne({
+        "youtubeChannel.youtubeID": channelID
+    }).exec();
+};
+
+export default mongoose.model<IUser>('User', UserSchema) as IUserModel;

@@ -11,6 +11,10 @@ import ICreatedVideoNotification from '../../Notification/Youtube/ICreatedVideoN
 import NotificationType from '../../Notification/NotificationType';
 import IUser from '../../UserService/Models/IUser';
 import UserModel from '../../UserService/Models/UserModel';
+import ICreatedVideoPayload from '../Notification/ICreatedVideoPayload';
+import CreatedVideoPayload from '../Notification/CreatedVideoPayload';
+import { IDeletedVideoPayload } from '../Notification/IDeletedVideoPayload';
+import DeletedVideoPayload from '../Notification/DeletedVideoPayload';
 
 const InsecureSchema : IValidationSchema = new ValidationSchema({
     "types": {
@@ -57,107 +61,57 @@ export default class CallbackRouter extends Router implements ICallbackRouter {
 
     public async handleCallback(request : Request, response : Response) : Promise<void> {
         this.logger.info(`recieved body: ${JSON.stringify(request.body)}`);
-        const duplicateNotification : ICreatedVideoNotification | null = await CreatedVideoNotification.findOne({
-            "videoID": request.body.feed.entry[0]["yt:videoid"][0]
-        }).exec();
-
-        if (duplicateNotification !== null) {
-            this.logger.warn("Attempted to create duplicate notification");
-            response.send().status(StatusCodes.BadRequest);
-            return;
+        try {
+            if (this.wasVideoCreated(request)) {
+                await this.createVideoNotification(request, response);
+            } else {
+                await this.deleteVideoNotification(request, response);
+            }
+            this.logger.info(`Successfully processed youtube callback`);
+        } catch (error) {
+            this.logger.error(error);
+            this.sendError(response, error, StatusCodes.InternalError);
         }
+    }
 
-        const user : IUser | null = await UserModel.findOne({
-            "youtubeChannel.youtubeID": request.body.feed.entry[0]["yt:channelid"][0]
-        }).exec();
+    private wasVideoCreated(request : Request) : boolean {
+        return request.body.feed.hasOwnProperty("entry");
+    }
 
+    private async createVideoNotification(request : Request, response : Response) : Promise<void> {
+        const payload : ICreatedVideoPayload = new CreatedVideoPayload(request);
+
+        const user : IUser | null = await UserModel.findUserByYoutubeID(payload.channelID());
         if (user === null) {
-            this.logger.error(
-                `Failed to find user with channelID: "${request.body.feed.entry[0]["yt:channelid"][0]}"`
-            );
+            this.logger.error(`Failed to find user with channelID: "${payload.channelID()}"`);
             response.send().status(StatusCodes.InternalError);
             return;
         }
 
         const notification : ICreatedVideoNotification = new CreatedVideoNotification({
             type: NotificationType.Youtube.CreateVideo,
-            channelID: request.body.feed.entry[0]["yt:channelid"][0],
-            datePublished: new Date(request.body.feed.entry[0].published[0]),
+            channelID: payload.channelID(),
+            datePublished: payload.datePublished(),
             fromUserID: user.id,
-            link: request.body.feed.entry[0].link[0].$.href,
-            title: request.body.feed.entry[0].title[0],
-            videoID: request.body.feed.entry[0]["yt:videoid"][0]
+            link: payload.link(),
+            title: payload.title(),
+            videoID: payload.videoID()
         });
+
+        if (await notification.isDuplicate()) {
+            this.logger.warn("Attempted to create duplicate notification");
+            response.send().status(StatusCodes.BadRequest);
+            return;
+        }
         await notification.save();
         response.send().status(StatusCodes.OK);
     }
-}
 
-// {
-//     "feed": {
-//         "$": {
-//             "xmlns:yt": "http://www.youtube.com/xml/schemas/2015",
-//             "xmlns": "http://www.w3.org/2005/Atom"
-//         },
-//         "link": [
-//             {
-//                 "$": {
-//                     "rel": "hub",
-//                     "href": "https://pubsubhubbub.appspot.com"
-//                 }
-//             },
-//             {
-//                 "$": {
-//                     "rel": "self",
-//                     "href": "https://www.youtube.com/xml/feeds/videos.xml?channel_id=UCJU7oHhmt-EUa8KNfpuvDhA"
-//                 }
-//             }
-//         ],
-//         "title": [
-//             "YouTube video feed"
-//         ],
-//         "updated": [
-//             "2019-07-30T08:07:48.581684321+00:00"
-//         ],
-//         "entry": [
-//             {
-//                 "id": [
-//                     "yt:video:WbzYmskEgDE"
-//                 ],
-//                 "yt:videoid": [
-//                     "WbzYmskEgDE"
-//                 ],
-//                 "yt:channelid": [
-//                     "UCJU7oHhmt-EUa8KNfpuvDhA"
-//                 ],
-//                 "title": [
-//                     "testvideo 1"
-//                 ],
-//                 "link": [
-//                     {
-//                         "$": {
-//                             "rel": "alternate",
-//                             "href": "https://www.youtube.com/watch?v=WbzYmskEgDE"
-//                         }
-//                     }
-//                 ],
-//                 "author": [
-//                     {
-//                         "name": [
-//                             "Evan Coulson"
-//                         ],
-//                         "uri": [
-//                             "https://www.youtube.com/channel/UCJU7oHhmt-EUa8KNfpuvDhA"
-//                         ]
-//                     }
-//                 ],
-//                 "published": [
-//                     "2019-07-30T08:07:19+00:00"
-//                 ],
-//                 "updated": [
-//                     "2019-07-30T08:07:48.581684321+00:00"
-//                 ]
-//             }
-//         ]
-//     }
-// }
+    private async deleteVideoNotification(request : Request, response : Response) : Promise<void> {
+        const payload : IDeletedVideoPayload = new DeletedVideoPayload(request);
+        
+        await CreatedVideoNotification.deleteOne({
+            videoID: payload.videoID()
+        }).exec();
+    }
+}

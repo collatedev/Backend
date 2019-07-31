@@ -227,7 +227,8 @@ describe("handleCallback", () => {
             });
             const response : any = MockResponse();
     
-            await expect(router.handleCallback(request, response)).rejects.toThrow(new Error("Failed to query db"));
+            await router.handleCallback(request, response);
+            expect(response.status).toHaveBeenCalledWith(StatusCodes.InternalError);
             UserModel.findOne = prop;
         });
     
@@ -240,6 +241,38 @@ describe("handleCallback", () => {
             await router.handleCallback(request, response);
     
             expect(response.status).toHaveBeenCalledWith(StatusCodes.InternalError);
+        });
+    });
+
+    describe("Delete Video", () => {
+        test("Deletes video notification from database",  async () => {
+            const user : IUser = await createUser(new TwitchUser(0), createYoutubeChannel("foo", "channelID", "bar"));
+            await createNotification(user.id);
+            const request : any = mockRequest({
+                body: getDeleteVideoBody()
+            });
+            const response : any = MockResponse();
+    
+            await router.handleCallback(request, response);
+
+            expect(await CreatedVideoNotification.find().exec()).toHaveLength(0);
+        });
+
+        test("Fails to query db", async() => {
+            const prop : any = UserModel.deleteOne;
+            UserModel.deleteOne = jest.fn().mockReturnValueOnce({
+                exec: async () : Promise<any> => {
+                    return Promise.reject(new Error("Failed to query db"));
+                }
+            });
+            const request : any = mockRequest({
+                body: getCreateVideoBody()
+            });
+            const response : any = MockResponse();
+    
+            await router.handleCallback(request, response);
+            expect(response.status).toHaveBeenCalledWith(StatusCodes.InternalError);
+            UserModel.findOne = prop;
         });
     });
 });
@@ -262,6 +295,7 @@ async function createUser(twitchUser : ITwitchUser, youtubeChannel : IYoutubeCha
     });
     return user.save();
 } 
+
 function getCreateVideoBody() : any {
     return {
         "feed": {
@@ -329,6 +363,54 @@ function getCreateVideoBody() : any {
                     ]
                 }
             ]
+        }
+    };
+}
+
+function createNotification(userID : string) : Promise<ICreatedVideoNotification> {
+    return new CreatedVideoNotification({
+        type: NotificationType.Youtube.CreateVideo,
+        channelID: "channelID",
+        datePublished: new Date(1),
+        fromUserID: userID,
+        link: "link",
+        title: "title",
+        videoID: "videoID"
+    }).save();
+}
+
+function getDeleteVideoBody() : any {
+    return {  
+        "feed": {  
+           "$":{  
+                "xmlns:at":"http://purl.org/atompub/tombstones/1.0",
+                "xmlns":"http://www.w3.org/2005/Atom"
+            },
+            "at:deleted-entry":[  
+                {  
+                    "$":{  
+                        "ref":"yt:video:videoID",
+                        "when":"2019-07-31T07:19:30+00:00"
+                    },
+                    "link":[  
+                        {  
+                            "$":{  
+                                "href":"https://www.youtube.com/watch?v=BYgis73x8CM"
+                            }
+                        }
+                    ],
+                    "at:by":[  
+                        {  
+                            "name":[  
+                                "Evan Coulson"
+                            ],
+                            "uri":[  
+                                "https://www.youtube.com/channel/channelID"
+                            ]
+                        }
+                    ]
+                }
+           ]
         }
     };
 }
