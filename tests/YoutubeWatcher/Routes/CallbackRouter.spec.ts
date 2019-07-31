@@ -175,53 +175,72 @@ afterEach(async () => {
 });
 
 describe("handleCallback", () => {
-    test("Saves notification to database", async() => {
-        await createUser(new TwitchUser(0), createYoutubeChannel("foo", "channelID", "bar"));
-        const request : any = mockRequest({
-			body: getCreateVideoBody()
-		});
-        const response : any = MockResponse();
-
-        await router.handleCallback(request, response);
-
-        const notification : ICreatedVideoNotification = (await CreatedVideoNotification.find().exec())[0];
-
-        expect(notification.channelID).toEqual("channelID");
-        expect(notification.createdAt).toBeInstanceOf(Date);
-        expect(notification.datePublished).toEqual(new Date(1));
-        expect(typeof notification.fromUserID).toEqual("string");
-        expect(notification.link).toEqual("link");
-        expect(notification.title).toEqual("title");
-        expect(notification.type).toEqual(NotificationType.Youtube.CreateVideo);
-        expect(notification.videoID).toEqual("videoID");
-        expect(response.status).toHaveBeenCalledWith(StatusCodes.OK);
-    });
-
-    test("Fails to query db", async() => {
-        const prop : any = UserModel.findOne;
-        UserModel.findOne = jest.fn().mockReturnValueOnce({
-            exec: async () : Promise<any> => {
-                return Promise.reject(new Error("Failed to query db"));
-            }
+    describe("Create Video", () => {
+        test("Saves created video notification to database", async() => {
+            await createUser(new TwitchUser(0), createYoutubeChannel("foo", "channelID", "bar"));
+            const request : any = mockRequest({
+                body: getCreateVideoBody()
+            });
+            const response : any = MockResponse();
+    
+            await router.handleCallback(request, response);
+    
+            const notification : ICreatedVideoNotification = (await CreatedVideoNotification.find().exec())[0];
+    
+            expect(notification.channelID).toEqual("channelID");
+            expect(notification.createdAt).toBeInstanceOf(Date);
+            expect(notification.datePublished).toEqual(new Date(1));
+            expect(typeof notification.fromUserID).toEqual("string");
+            expect(notification.link).toEqual("link");
+            expect(notification.title).toEqual("title");
+            expect(notification.type).toEqual(NotificationType.Youtube.CreateVideo);
+            expect(notification.videoID).toEqual("videoID");
+            expect(response.status).toHaveBeenCalledWith(StatusCodes.OK);
         });
-        const request : any = mockRequest({
-			body: getCreateVideoBody()
-		});
-        const response : any = MockResponse();
+    
+        test("Ensure no duplicate notifications", async() => {
+            await createUser(new TwitchUser(0), createYoutubeChannel("foo", "channelID", "bar"));
+            const request : any = mockRequest({
+                body: getCreateVideoBody()
+            });
+            const response : any = MockResponse();
+            const expectedLength : number = 1;
 
-        await expect(router.handleCallback(request, response)).rejects.toThrow(new Error("Failed to query db"));
-        UserModel.findOne = prop;
-    });
-
-    test("Does not find user", async() => {
-        const request : any = mockRequest({
-			body: getCreateVideoBody()
-		});
-        const response : any = MockResponse();
-
-        await router.handleCallback(request, response);
-
-        expect(response.status).toHaveBeenCalledWith(StatusCodes.InternalError);
+            await router.handleCallback(request, response);
+            await router.handleCallback(request, response);
+    
+            const notifications : ICreatedVideoNotification[] = (await CreatedVideoNotification.find().exec());
+    
+            expect(notifications).toHaveLength(expectedLength);
+            expect(response.status).toHaveBeenCalledWith(StatusCodes.BadRequest);
+        });
+    
+        test("Fails to query db", async() => {
+            const prop : any = UserModel.findOne;
+            UserModel.findOne = jest.fn().mockReturnValueOnce({
+                exec: async () : Promise<any> => {
+                    return Promise.reject(new Error("Failed to query db"));
+                }
+            });
+            const request : any = mockRequest({
+                body: getCreateVideoBody()
+            });
+            const response : any = MockResponse();
+    
+            await expect(router.handleCallback(request, response)).rejects.toThrow(new Error("Failed to query db"));
+            UserModel.findOne = prop;
+        });
+    
+        test("Does not find user", async() => {
+            const request : any = mockRequest({
+                body: getCreateVideoBody()
+            });
+            const response : any = MockResponse();
+    
+            await router.handleCallback(request, response);
+    
+            expect(response.status).toHaveBeenCalledWith(StatusCodes.InternalError);
+        });
     });
 });
 

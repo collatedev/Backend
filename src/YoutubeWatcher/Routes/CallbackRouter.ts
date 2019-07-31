@@ -57,6 +57,16 @@ export default class CallbackRouter extends Router implements ICallbackRouter {
 
     public async handleCallback(request : Request, response : Response) : Promise<void> {
         this.logger.info(`recieved body: ${JSON.stringify(request.body)}`);
+        const duplicateNotification : ICreatedVideoNotification | null = await CreatedVideoNotification.findOne({
+            "videoID": request.body.feed.entry[0]["yt:videoid"][0]
+        }).exec();
+
+        if (duplicateNotification !== null) {
+            this.logger.warn("Attempted to create duplicate notification");
+            response.send().status(StatusCodes.BadRequest);
+            return;
+        }
+
         const user : IUser | null = await UserModel.findOne({
             "youtubeChannel.youtubeID": request.body.feed.entry[0]["yt:channelid"][0]
         }).exec();
