@@ -25,7 +25,7 @@ test("It should create a notificiation", async () => {
     
     await notification.save();
 
-    expect(notification.type).toEqual("Youtube:CreateVideo");
+    expect(notification.type).toEqual(NotificationType.Youtube.CreateVideo);
     expect(notification.createdAt).toBeInstanceOf(Date);
     expect(notification.fromUserID).toEqual("foo");
 });
@@ -40,7 +40,7 @@ test("It should create and find notificiation", async () => {
     const foundNotification : INotification = 
         await NotificationSchema.findById(notification.id).exec() as INotification;
     
-    expect(foundNotification.type).toEqual("Youtube:CreateVideo");
+    expect(foundNotification.type).toEqual(NotificationType.Youtube.CreateVideo);
     expect(foundNotification.createdAt).toBeInstanceOf(Date);
     expect(foundNotification.fromUserID).toEqual("foo");
 });

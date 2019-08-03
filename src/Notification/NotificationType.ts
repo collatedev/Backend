@@ -1,5 +1,5 @@
 export default {
     Youtube: {
-        CreateVideo: "Youtube:CreateVideo"
+        CreateVideo: "Youtube:UploadedVideo"
     }
 };

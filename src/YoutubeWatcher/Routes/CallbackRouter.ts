@@ -88,30 +88,38 @@ export default class CallbackRouter extends Router implements ICallbackRouter {
             return;
         }
 
-        const notification : ICreatedVideoNotification = new CreatedVideoNotification({
-            type: NotificationType.Youtube.CreateVideo,
-            channelID: payload.channelID(),
-            datePublished: payload.datePublished(),
-            fromUserID: user.id,
-            link: payload.link(),
-            title: payload.title(),
-            videoID: payload.videoID()
-        });
+        const notification : ICreatedVideoNotification | null = 
+            await CreatedVideoNotification.findByVideoID(payload.videoID());
 
-        if (await notification.isDuplicate()) {
-            this.logger.warn("Attempted to create duplicate notification");
-            response.send().status(StatusCodes.BadRequest);
-            return;
+        if (notification === null) {
+            await new CreatedVideoNotification({
+                type: NotificationType.Youtube.CreateVideo,
+                channelID: payload.channelID(),
+                datePublished: payload.datePublished(),
+                fromUserID: user.id,
+                link: payload.link(),
+                title: payload.title(),
+                videoID: payload.videoID()
+            }).save();
+        } else {
+            if (notification.title !== payload.title()) {
+                notification.title = payload.title();
+            }
+            await notification.save();   
         }
-        await notification.save();
         response.send().status(StatusCodes.OK);
     }
 
     private async deleteVideoNotification(request : Request, response : Response) : Promise<void> {
-        const payload : IDeletedVideoPayload = new DeletedVideoPayload(request);
-        
-        await CreatedVideoNotification.deleteOne({
-            videoID: payload.videoID()
-        }).exec();
+        try {
+            const payload : IDeletedVideoPayload = new DeletedVideoPayload(request);
+            await CreatedVideoNotification.deleteOne({
+                videoID: payload.videoID()
+            }).exec();
+            response.send().status(StatusCodes.OK);
+        } catch(error) {
+            this.logger.error(error);
+            response.send().status(StatusCodes.InternalError);
+        }
     }
 }

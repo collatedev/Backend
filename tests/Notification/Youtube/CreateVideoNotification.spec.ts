@@ -39,31 +39,6 @@ test("creates a notification", async () => {
     expect(notification.link).toEqual("link");
 });
 
-test("finds a notification", async () => {
-    const created : ICreatedVideoNotification = new CreatedVideoNotification({
-        type: NotificationType.Youtube.CreateVideo,
-        title: "title",
-        videoID: "videoID",
-        channelID: "channelID",
-        datePublished: new Date(1),
-        fromUserID: "fromUserID",
-        link: "link"
-    });
-    await created.save();
-    
-    const notification : ICreatedVideoNotification = 
-        await CreatedVideoNotification.findById(created._id).exec() as ICreatedVideoNotification;
-
-    expect(notification.type).toEqual(NotificationType.Youtube.CreateVideo);
-    expect(notification.title).toEqual("title");
-    expect(notification.videoID).toEqual("videoID");
-    expect(notification.channelID).toEqual("channelID");
-    expect(notification.datePublished).toEqual(new Date(1));
-    expect(notification.fromUserID).toEqual("fromUserID");
-    expect(notification.link).toEqual("link");
-    expect(notification.createdAt).toBeInstanceOf(Date);
-});
-
 test("that the notification is not a duplicate", async () => {
     const created : ICreatedVideoNotification = new CreatedVideoNotification({
         type: NotificationType.Youtube.CreateVideo,
@@ -115,4 +90,26 @@ test("that the notification is a duplicate", async () => {
     await created1.save();
     
     expect(await created2.isDuplicate()).toBeTruthy();
+});
+
+test("Can find a notification by video ID", async () => {
+    await new CreatedVideoNotification({
+        type: NotificationType.Youtube.CreateVideo,
+        title: "title",
+        videoID: "videoID",
+        channelID: "channelID",
+        datePublished: new Date(1),
+        fromUserID: "fromUserID",
+        link: "link"
+    }).save();
+    
+    const notification : ICreatedVideoNotification =
+        await CreatedVideoNotification.findByVideoID("videoID") as ICreatedVideoNotification;
+    
+    expect(notification).not.toBeNull();
+    expect(notification.videoID).toEqual("videoID");
+});
+
+test("Does not find a notification by video ID", async () => {    
+    expect(await CreatedVideoNotification.findByVideoID("videoID")).toBeNull();
 });

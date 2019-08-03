@@ -15,14 +15,28 @@ import CreatedVideoNotification from "../../../src/Notification/Youtube/CreatedV
 import NotificationType from "../../../src/Notification/NotificationType";
 import UserModel from "../../../src/UserService/Models/UserModel";
 import TwitchUser from "../../../src/UserService/Models/TwitchUser";
-import IUser from "../../../src/UserService/Models/IUser";
-import ITwitchUser from "../../../src/UserService/Models/ITwitchUser";
 import YoutubeChannel from "../../../src/UserService/Models/YoutubeChannel";
 import IYoutubeChannel from "../../../src/UserService/Models/IYoutubeChannel";
+import YoutubeVideoPayload from "../../Payload/YoutubeVideoPayload";
 
 const schema : IValidationSchema = new ValidationSchema(WebhookSchema);
 const router : CallbackRouter = new CallbackRouter(new MockLogger());
+const youtubeVideoPayload : any = YoutubeVideoPayload;
 router.setup();
+
+const db : MockDB = new MockDB();
+
+beforeAll(async () => {
+    await db.start();
+});
+
+afterAll(async () => {
+    await db.stop();
+});
+
+afterEach(async () => {
+    await db.cleanup();
+});
 
 describe("constructor", () => {
     test("It checks that the route has the proper path", () => {
@@ -160,26 +174,21 @@ describe("handleChallenge", () => {
     });
 });
 
-const db : MockDB = new MockDB();
-
-beforeAll(async () => {
-    await db.start();
-});
-
-afterAll(async () => {
-    await db.stop();
-});
-
-afterEach(async () => {
-    await db.cleanup();
-});
-
 describe("handleCallback", () => {
+    beforeEach(() => {
+        UserModel.findUserByYoutubeID = jest.fn().mockReturnValue(
+            Promise.resolve({
+                id: "foo",
+                twitchUser: new TwitchUser(0),
+                youtubeChannel: createYoutubeChannel("foo", "channelID", "bar")
+            })
+        );
+    });
+
     describe("Create Video", () => {
         test("Saves created video notification to database", async() => {
-            await createUser(new TwitchUser(0), createYoutubeChannel("foo", "channelID", "bar"));
             const request : any = mockRequest({
-                body: getCreateVideoBody()
+                body: youtubeVideoPayload
             });
             const response : any = MockResponse();
     
@@ -198,43 +207,25 @@ describe("handleCallback", () => {
             expect(response.status).toHaveBeenCalledWith(StatusCodes.OK);
         });
     
-        test("Ensure no duplicate notifications", async() => {
-            await createUser(new TwitchUser(0), createYoutubeChannel("foo", "channelID", "bar"));
-            const request : any = mockRequest({
-                body: getCreateVideoBody()
-            });
-            const response : any = MockResponse();
-            const expectedLength : number = 1;
-
-            await router.handleCallback(request, response);
-            await router.handleCallback(request, response);
-    
-            const notifications : ICreatedVideoNotification[] = (await CreatedVideoNotification.find().exec());
-    
-            expect(notifications).toHaveLength(expectedLength);
-            expect(response.status).toHaveBeenCalledWith(StatusCodes.BadRequest);
-        });
-    
         test("Fails to query db", async() => {
-            const prop : any = UserModel.findOne;
-            UserModel.findOne = jest.fn().mockReturnValueOnce({
-                exec: async () : Promise<any> => {
-                    return Promise.reject(new Error("Failed to query db"));
-                }
-            });
+            UserModel.findUserByYoutubeID = jest.fn().mockReturnValueOnce(
+                Promise.reject(new Error("Failed to query db"))
+            );
             const request : any = mockRequest({
-                body: getCreateVideoBody()
+                body: youtubeVideoPayload
             });
             const response : any = MockResponse();
     
             await router.handleCallback(request, response);
             expect(response.status).toHaveBeenCalledWith(StatusCodes.InternalError);
-            UserModel.findOne = prop;
         });
     
         test("Does not find user", async() => {
+            UserModel.findUserByYoutubeID = jest.fn().mockReturnValueOnce(
+                Promise.resolve(null)
+            );
             const request : any = mockRequest({
-                body: getCreateVideoBody()
+                body: youtubeVideoPayload
             });
             const response : any = MockResponse();
     
@@ -246,8 +237,7 @@ describe("handleCallback", () => {
 
     describe("Delete Video", () => {
         test("Deletes video notification from database",  async () => {
-            const user : IUser = await createUser(new TwitchUser(0), createYoutubeChannel("foo", "channelID", "bar"));
-            await createNotification(user.id);
+            await createNotification("foo");
             const request : any = mockRequest({
                 body: getDeleteVideoBody()
             });
@@ -256,23 +246,44 @@ describe("handleCallback", () => {
             await router.handleCallback(request, response);
 
             expect(await CreatedVideoNotification.find().exec()).toHaveLength(0);
+            expect(response.status).toHaveBeenCalledWith(StatusCodes.OK);
         });
 
-        test("Fails to query db", async() => {
-            const prop : any = UserModel.deleteOne;
-            UserModel.deleteOne = jest.fn().mockReturnValueOnce({
+        test("Fails to query db", async () => {
+            const prop : any = CreatedVideoNotification.deleteOne;
+            CreatedVideoNotification.deleteOne = jest.fn().mockReturnValueOnce({
                 exec: async () : Promise<any> => {
                     return Promise.reject(new Error("Failed to query db"));
                 }
             });
             const request : any = mockRequest({
-                body: getCreateVideoBody()
+                body: getDeleteVideoBody()
             });
             const response : any = MockResponse();
     
             await router.handleCallback(request, response);
             expect(response.status).toHaveBeenCalledWith(StatusCodes.InternalError);
-            UserModel.findOne = prop;
+            CreatedVideoNotification.deleteOne = prop;
+        });
+    });
+
+    describe("Update title", () => {
+        test("Updates video title form database", async () => {
+            const createdNotification : ICreatedVideoNotification = await createNotification("foo");
+            const request : any = mockRequest({
+                body: youtubeVideoPayload
+            });
+            request.body.feed.entry[0].title[0] = "update";
+            const response : any = MockResponse();
+    
+            await router.handleCallback(request, response);
+
+            const notification : ICreatedVideoNotification = 
+                await CreatedVideoNotification.findById(createdNotification.id).exec()as ICreatedVideoNotification;
+
+            expect(notification.title).toEqual("update");
+            expect(notification.id).toEqual(createdNotification.id);
+            expect(await CreatedVideoNotification.find().exec()).toHaveLength(1);
         });
     });
 });
@@ -286,85 +297,6 @@ function createYoutubeChannel(name : string, id: string, title : string) : IYout
             }
         }]
     });
-}
-
-async function createUser(twitchUser : ITwitchUser, youtubeChannel : IYoutubeChannel) : Promise<IUser> {
-    const user : IUser = new UserModel({
-        twitchUser,
-        youtubeChannel
-    });
-    return user.save();
-} 
-
-function getCreateVideoBody() : any {
-    return {
-        "feed": {
-            "$": {
-                "xmlns:yt": "http://www.youtube.com/xml/schemas/2015",
-                "xmlns": "http://www.w3.org/2005/Atom"
-            },
-            "link": [
-                {
-                    "$": {
-                        "rel": "hub",
-                        "href": "https://pubsubhubbub.appspot.com"
-                    }
-                },
-                {
-                    "$": {
-                        "rel": "self",
-                        "href": "https://www.youtube.com/xml/feeds/videos.xml?channel_id=UCJU7oHhmt-EUa8KNfpuvDhA"
-                    }
-                }
-            ],
-            "title": [
-                "YouTube video feed"
-            ],
-            "updated": [
-                "2019-07-30T08:07:48.581684321+00:00"
-            ],
-            "entry": [
-                {
-                    "id": [
-                        "yt:video:WbzYmskEgDE"
-                    ],
-                    "yt:videoid": [
-                        "videoID"
-                    ],
-                    "yt:channelid": [
-                        "channelID"
-                    ],
-                    "title": [
-                        "title"
-                    ],
-                    "link": [
-                        {
-                            "$": {
-                                "rel": "alternate",
-                                "href": "link"
-                            }
-                        }
-                    ],
-                    "author": [
-                        {
-                            "name": [
-                                "Evan Coulson"
-                            ],
-                            "uri": [
-                                "https://www.youtube.com/channel/UCJU7oHhmt-EUa8KNfpuvDhA"
-                            ]
-                        }
-                    ],
-                    "published": [
-                        "1970-01-01T00:00:00.001Z"
-                    ],
-                    "updated": [
-                        "2019-07-30T08:07:48.581684321+00:00"
-                    ]
-                }
-            ]
-        }
-    };
 }
 
 function createNotification(userID : string) : Promise<ICreatedVideoNotification> {
