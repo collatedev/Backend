@@ -1,4 +1,4 @@
-import { IDeletedVideoPayload } from "./IDeletedVideoPayload";
+import { IDeletedVideoPayload } from "./IDeletedVideo";
 import { Request } from "express";
 
 export default class DeletedVideoPayload implements IDeletedVideoPayload {

@@ -10,18 +10,17 @@ import WebhookSchema from "../../../src/RequestSchemas/WebhookChallengeRequest.j
 import ErrorMessage from "../../../src/Router/Messages/ErrorMessage";
 import validate from "../../../src/Router/Middleware/Validate";
 import MockDB from "../../mocks/MockDB";
-import ICreatedVideoNotification from "../../../src/Notification/Youtube/ICreatedVideoNotification";
-import CreatedVideoNotification from "../../../src/Notification/Youtube/CreatedVideoNotification";
+import IYoutubeVideo from "../../../src/Notification/Youtube/IYoutubeVideo";
+import YoutubeVideoModel from "../../../src/Notification/Youtube/YoutubeVideoModel";
 import NotificationType from "../../../src/Notification/NotificationType";
 import UserModel from "../../../src/UserService/Models/UserModel";
 import TwitchUser from "../../../src/UserService/Models/TwitchUser";
 import YoutubeChannel from "../../../src/UserService/Models/YoutubeChannel";
 import IYoutubeChannel from "../../../src/UserService/Models/IYoutubeChannel";
-import YoutubeVideoPayload from "../../Payload/YoutubeVideoPayload";
+import CreateVideoPayload from "../../Payload/CreateVideoPayload";
 
 const schema : IValidationSchema = new ValidationSchema(WebhookSchema);
 const router : CallbackRouter = new CallbackRouter(new MockLogger());
-const youtubeVideoPayload : any = YoutubeVideoPayload;
 router.setup();
 
 const db : MockDB = new MockDB();
@@ -188,13 +187,13 @@ describe("handleCallback", () => {
     describe("Create Video", () => {
         test("Saves created video notification to database", async() => {
             const request : any = mockRequest({
-                body: youtubeVideoPayload
+                body: CreateVideoPayload()
             });
             const response : any = MockResponse();
     
             await router.handleCallback(request, response);
     
-            const notification : ICreatedVideoNotification = (await CreatedVideoNotification.find().exec())[0];
+            const notification : IYoutubeVideo = (await YoutubeVideoModel.find().exec())[0];
     
             expect(notification.channelID).toEqual("channelID");
             expect(notification.createdAt).toBeInstanceOf(Date);
@@ -212,7 +211,7 @@ describe("handleCallback", () => {
                 Promise.reject(new Error("Failed to query db"))
             );
             const request : any = mockRequest({
-                body: youtubeVideoPayload
+                body: CreateVideoPayload()
             });
             const response : any = MockResponse();
     
@@ -225,7 +224,7 @@ describe("handleCallback", () => {
                 Promise.resolve(null)
             );
             const request : any = mockRequest({
-                body: youtubeVideoPayload
+                body: CreateVideoPayload()
             });
             const response : any = MockResponse();
     
@@ -245,13 +244,13 @@ describe("handleCallback", () => {
     
             await router.handleCallback(request, response);
 
-            expect(await CreatedVideoNotification.find().exec()).toHaveLength(0);
+            expect(await YoutubeVideoModel.find().exec()).toHaveLength(0);
             expect(response.status).toHaveBeenCalledWith(StatusCodes.OK);
         });
 
         test("Fails to query db", async () => {
-            const prop : any = CreatedVideoNotification.deleteOne;
-            CreatedVideoNotification.deleteOne = jest.fn().mockReturnValueOnce({
+            const prop : any = YoutubeVideoModel.deleteOne;
+            YoutubeVideoModel.deleteOne = jest.fn().mockReturnValueOnce({
                 exec: async () : Promise<any> => {
                     return Promise.reject(new Error("Failed to query db"));
                 }
@@ -263,27 +262,44 @@ describe("handleCallback", () => {
     
             await router.handleCallback(request, response);
             expect(response.status).toHaveBeenCalledWith(StatusCodes.InternalError);
-            CreatedVideoNotification.deleteOne = prop;
+            YoutubeVideoModel.deleteOne = prop;
         });
     });
 
     describe("Update title", () => {
         test("Updates video title form database", async () => {
-            const createdNotification : ICreatedVideoNotification = await createNotification("foo");
+            const createdNotification : IYoutubeVideo = await createNotification("foo");
             const request : any = mockRequest({
-                body: youtubeVideoPayload
+                body: CreateVideoPayload()
             });
             request.body.feed.entry[0].title[0] = "update";
             const response : any = MockResponse();
     
             await router.handleCallback(request, response);
 
-            const notification : ICreatedVideoNotification = 
-                await CreatedVideoNotification.findById(createdNotification.id).exec()as ICreatedVideoNotification;
+            const notification : IYoutubeVideo = 
+                await YoutubeVideoModel.findById(createdNotification.id).exec()as IYoutubeVideo;
 
             expect(notification.title).toEqual("update");
             expect(notification.id).toEqual(createdNotification.id);
-            expect(await CreatedVideoNotification.find().exec()).toHaveLength(1);
+            expect(await YoutubeVideoModel.find().exec()).toHaveLength(1);
+		});
+		
+		test("Fails to query db", async () => {
+            const prop : any = YoutubeVideoModel.findOne;
+            YoutubeVideoModel.findOne = jest.fn().mockReturnValueOnce({
+                exec: async () : Promise<any> => {
+                    return Promise.reject(new Error("Failed to query db"));
+                }
+            });
+            const request : any = mockRequest({
+                body: CreateVideoPayload()
+            });
+            const response : any = MockResponse();
+    
+            await router.handleCallback(request, response);
+            expect(response.status).toHaveBeenCalledWith(StatusCodes.InternalError);
+            YoutubeVideoModel.findOne = prop;
         });
     });
 });
@@ -299,8 +315,8 @@ function createYoutubeChannel(name : string, id: string, title : string) : IYout
     });
 }
 
-function createNotification(userID : string) : Promise<ICreatedVideoNotification> {
-    return new CreatedVideoNotification({
+function createNotification(userID : string) : Promise<IYoutubeVideo> {
+    return new YoutubeVideoModel({
         type: NotificationType.Youtube.CreateVideo,
         channelID: "channelID",
         datePublished: new Date(1),

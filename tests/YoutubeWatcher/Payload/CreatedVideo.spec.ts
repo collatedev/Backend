@@ -1,10 +1,11 @@
 import mockRequest from "../../mocks/MockRequest";
-import ICreatedVideoPayload from "../../../src/YoutubeWatcher/Notification/ICreatedVideoPayload";
-import CreatedVideoPayload from "../../../src/YoutubeWatcher/Notification/CreatedVideoPayload";
+import ICreatedVideoPayload from "../../../src/YoutubeWatcher/Payload/ICreatedVideo";
+import CreatedVideoPayload from "../../../src/YoutubeWatcher/Payload/CreatedVideo";
+import CreateVideoPayload from "../../Payload/CreateVideoPayload";
 
 test("It creates a video payload", () => {
     const request : any = mockRequest({
-        body: getCreateVideoBody()
+        body: CreateVideoPayload()
     });
 
     const payload : ICreatedVideoPayload = new CreatedVideoPayload(request);
@@ -18,7 +19,7 @@ test("It creates a video payload", () => {
 
 test("It fails to a payload due to missing feed", () => {
     const request : any = mockRequest({
-        body: getCreateVideoBody()
+        body: CreateVideoPayload()
     });
 
     delete request.body.feed;
@@ -30,7 +31,7 @@ test("It fails to a payload due to missing feed", () => {
 
 test("It fails to a payload due to missing entry", () => {
     const request : any = mockRequest({
-        body: getCreateVideoBody()
+        body: CreateVideoPayload()
     });
 
     delete request.body.feed.entry;
@@ -42,7 +43,7 @@ test("It fails to a payload due to missing entry", () => {
 
 test("It fails to a payload due to no entries", () => {
     const request : any = mockRequest({
-        body: getCreateVideoBody()
+        body: CreateVideoPayload()
     });
 
     request.body.feed.entry.pop();
@@ -54,7 +55,7 @@ test("It fails to a payload due to no entries", () => {
 
 test("It fails to a payload due to missing channelID", () => {
     const request : any = mockRequest({
-        body: getCreateVideoBody()
+        body: CreateVideoPayload()
     });
 
     delete request.body.feed.entry[0]["yt:channelid"];
@@ -66,7 +67,7 @@ test("It fails to a payload due to missing channelID", () => {
 
 test("It fails to a payload due to missing datePublished", () => {
     const request : any = mockRequest({
-        body: getCreateVideoBody()
+        body: CreateVideoPayload()
     });
 
     delete request.body.feed.entry[0].published;
@@ -78,7 +79,7 @@ test("It fails to a payload due to missing datePublished", () => {
 
 test("It fails to a payload due to missing link", () => {
     const request : any = mockRequest({
-        body: getCreateVideoBody()
+        body: CreateVideoPayload()
     });
 
     delete request.body.feed.entry[0].link;
@@ -90,7 +91,7 @@ test("It fails to a payload due to missing link", () => {
 
 test("It fails to a payload due to missing title", () => {
     const request : any = mockRequest({
-        body: getCreateVideoBody()
+        body: CreateVideoPayload()
     });
 
     delete request.body.feed.entry[0].title;
@@ -102,7 +103,7 @@ test("It fails to a payload due to missing title", () => {
 
 test("It fails to a payload due to missing videoID", () => {
     const request : any = mockRequest({
-        body: getCreateVideoBody()
+        body: CreateVideoPayload()
     });
 
     delete request.body.feed.entry[0]["yt:videoid"];
@@ -111,74 +112,3 @@ test("It fails to a payload due to missing videoID", () => {
         return new CreatedVideoPayload(request);
     }).toThrow(new Error("Request is missing videoID"));
 });
-
-function getCreateVideoBody() : any {
-    return {
-        "feed": {
-            "$": {
-                "xmlns:yt": "http://www.youtube.com/xml/schemas/2015",
-                "xmlns": "http://www.w3.org/2005/Atom"
-            },
-            "link": [
-                {
-                    "$": {
-                        "rel": "hub",
-                        "href": "https://pubsubhubbub.appspot.com"
-                    }
-                },
-                {
-                    "$": {
-                        "rel": "self",
-                        "href": "https://www.youtube.com/xml/feeds/videos.xml?channel_id=UCJU7oHhmt-EUa8KNfpuvDhA"
-                    }
-                }
-            ],
-            "title": [
-                "YouTube video feed"
-            ],
-            "updated": [
-                "2019-07-30T08:07:48.581684321+00:00"
-            ],
-            "entry": [
-                {
-                    "id": [
-                        "yt:video:WbzYmskEgDE"
-                    ],
-                    "yt:videoid": [
-                        "videoID"
-                    ],
-                    "yt:channelid": [
-                        "channelID"
-                    ],
-                    "title": [
-                        "title"
-                    ],
-                    "link": [
-                        {
-                            "$": {
-                                "rel": "alternate",
-                                "href": "link"
-                            }
-                        }
-                    ],
-                    "author": [
-                        {
-                            "name": [
-                                "Evan Coulson"
-                            ],
-                            "uri": [
-                                "https://www.youtube.com/channel/UCJU7oHhmt-EUa8KNfpuvDhA"
-                            ]
-                        }
-                    ],
-                    "published": [
-                        "1970-01-01T00:00:00.001Z"
-                    ],
-                    "updated": [
-                        "2019-07-30T08:07:48.581684321+00:00"
-                    ]
-                }
-            ]
-        }
-    };
-}

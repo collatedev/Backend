@@ -1,7 +1,7 @@
 import { Schema } from "mongoose";
 import Notification from "../Notification";
-import ICreatedVideoNotification from "./ICreatedVideoNotification";
-import ICreatedVideoModel from "./ICreatedVideoModel";
+import IYoutubeVideo from "./IYoutubeVideo";
+import IYoutubeVideoModel from "./IYoutubeVideoModel";
 
 const YoutubeVideoSchema : Schema = new Schema({
     channelID: String,
@@ -13,10 +13,10 @@ const YoutubeVideoSchema : Schema = new Schema({
 }); 
 
 YoutubeVideoSchema.methods.isDuplicate = async function() : Promise<boolean> {
-    const currentContext : ICreatedVideoNotification = this as ICreatedVideoNotification;
-    const results : ICreatedVideoNotification[] = await currentContext.model('YoutubeCreateVideoNotification').find({
+    const currentContext : IYoutubeVideo = this as IYoutubeVideo;
+    const results : IYoutubeVideo[] = await currentContext.model('YoutubeCreateVideoNotification').find({
         "videoID": currentContext.videoID
-    }).exec() as ICreatedVideoNotification[];
+    }).exec() as IYoutubeVideo[];
     if (results.length === 0) {
         return false;
     }
@@ -25,12 +25,12 @@ YoutubeVideoSchema.methods.isDuplicate = async function() : Promise<boolean> {
 
 YoutubeVideoSchema.statics.findByVideoID = async function(
     videoID : string
-) : Promise<ICreatedVideoNotification | null> {
-    const currentContext : ICreatedVideoModel = this as ICreatedVideoModel;
+) : Promise<IYoutubeVideo | null> {
+    const currentContext : IYoutubeVideoModel = this as IYoutubeVideoModel;
     return currentContext.findOne({ videoID }).exec();
 }; 
 
-export default Notification.discriminator<ICreatedVideoNotification>(
+export default Notification.discriminator<IYoutubeVideo>(
     'YoutubeCreateVideoNotification', 
     YoutubeVideoSchema
-) as ICreatedVideoModel;
+) as IYoutubeVideoModel;

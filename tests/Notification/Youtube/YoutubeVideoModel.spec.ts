@@ -1,6 +1,6 @@
 import MockDB from "../../mocks/MockDB";
-import CreatedVideoNotification from "../../../src/Notification/Youtube/CreatedVideoNotification";
-import ICreatedVideoNotification from "../../../src/Notification/Youtube/ICreatedVideoNotification";
+import YoutubeVideoModel from "../../../src/Notification/Youtube/YoutubeVideoModel";
+import IYoutubeVideo from "../../../src/Notification/Youtube/IYoutubeVideo";
 import NotificationType from "../../../src/Notification/NotificationType";
 
 const db : MockDB = new MockDB();
@@ -18,7 +18,7 @@ afterEach(async () => {
 });
 
 test("creates a notification", async () => {
-    const notification : ICreatedVideoNotification = new CreatedVideoNotification({
+    const notification : IYoutubeVideo = new YoutubeVideoModel({
         type: NotificationType.Youtube.CreateVideo,
         title: "title",
         videoID: "videoID",
@@ -40,7 +40,7 @@ test("creates a notification", async () => {
 });
 
 test("that the notification is not a duplicate", async () => {
-    const created : ICreatedVideoNotification = new CreatedVideoNotification({
+    const created : IYoutubeVideo = new YoutubeVideoModel({
         type: NotificationType.Youtube.CreateVideo,
         title: "title",
         videoID: "videoID",
@@ -54,7 +54,7 @@ test("that the notification is not a duplicate", async () => {
 });
 
 test("that the notification is not a duplicate", async () => {
-    const created : ICreatedVideoNotification = new CreatedVideoNotification({
+    const created : IYoutubeVideo = new YoutubeVideoModel({
         type: NotificationType.Youtube.CreateVideo,
         title: "title",
         videoID: "videoID",
@@ -69,7 +69,7 @@ test("that the notification is not a duplicate", async () => {
 });
 
 test("that the notification is a duplicate", async () => {
-    const created1 : ICreatedVideoNotification = new CreatedVideoNotification({
+    const created1 : IYoutubeVideo = new YoutubeVideoModel({
         type: NotificationType.Youtube.CreateVideo,
         title: "title",
         videoID: "videoID",
@@ -78,7 +78,7 @@ test("that the notification is a duplicate", async () => {
         fromUserID: "fromUserID",
         link: "link"
     });
-    const created2 : ICreatedVideoNotification = new CreatedVideoNotification({
+    const created2 : IYoutubeVideo = new YoutubeVideoModel({
         type: NotificationType.Youtube.CreateVideo,
         title: "title",
         videoID: "videoID",
@@ -93,7 +93,7 @@ test("that the notification is a duplicate", async () => {
 });
 
 test("Can find a notification by video ID", async () => {
-    await new CreatedVideoNotification({
+    await new YoutubeVideoModel({
         type: NotificationType.Youtube.CreateVideo,
         title: "title",
         videoID: "videoID",
@@ -103,13 +103,13 @@ test("Can find a notification by video ID", async () => {
         link: "link"
     }).save();
     
-    const notification : ICreatedVideoNotification =
-        await CreatedVideoNotification.findByVideoID("videoID") as ICreatedVideoNotification;
+    const notification : IYoutubeVideo =
+        await YoutubeVideoModel.findByVideoID("videoID") as IYoutubeVideo;
     
     expect(notification).not.toBeNull();
     expect(notification.videoID).toEqual("videoID");
 });
 
 test("Does not find a notification by video ID", async () => {    
-    expect(await CreatedVideoNotification.findByVideoID("videoID")).toBeNull();
+    expect(await YoutubeVideoModel.findByVideoID("videoID")).toBeNull();
 });

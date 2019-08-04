@@ -1,4 +1,4 @@
-import ICreatedVideoPayload from "./ICreatedVideoPayload";
+import ICreatedVideoPayload from "./ICreatedVideo";
 import { Request } from "express";
 
 export default class CreatedVideoPayload implements ICreatedVideoPayload {

@@ -1,6 +1,6 @@
-import DeletedVideoPayload from "../../../src/YoutubeWatcher/Notification/DeletedVideoPayload";
+import DeletedVideoPayload from "../../../src/YoutubeWatcher/Payload/DeletedVideo";
 import mockRequest from "../../mocks/MockRequest";
-import { IDeletedVideoPayload } from "../../../src/YoutubeWatcher/Notification/IDeletedVideoPayload";
+import { IDeletedVideoPayload } from "../../../src/YoutubeWatcher/Payload/IDeletedVideo";
 
 test("It should fail to create payload due to missing feed", () => {
     const request : any = mockRequest({
