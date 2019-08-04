@@ -69,7 +69,7 @@ export default class CallbackRouter extends Router implements ICallbackRouter {
 	}
 	
 	private async getUser(payload : ICreatedVideoPayload) : Promise<IUser> {
-		const user : IUser | null = await UserModel.findUserByYoutubeID(payload.channelID());
+		const user : IUser | null = await UserModel.findByYoutubeID(payload.channelID());
         if (user === null) {
             this.logger.error(`Failed to find user with channelID: "${payload.channelID()}"`);
             throw new Error("Did not find user");

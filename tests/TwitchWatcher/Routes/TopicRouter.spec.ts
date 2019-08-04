@@ -177,7 +177,7 @@ describe('handleWebhookCall', () => {
 		await router.handleWebhookCall(request, response);
 
 		expect(response.status).toHaveBeenCalledWith(StatusCodes.InternalError);
-		expect(response.json).toHaveBeenCalledWith(new ErrorMessage("Failed to process webhook data"));
+		expect(response.json).toHaveBeenCalledWith(new ErrorMessage(new Error("process failed")));
 	});
 
 	test('Should process data', async () => {

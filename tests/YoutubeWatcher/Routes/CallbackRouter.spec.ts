@@ -175,7 +175,7 @@ describe("handleChallenge", () => {
 
 describe("handleCallback", () => {
     beforeEach(() => {
-        UserModel.findUserByYoutubeID = jest.fn().mockReturnValue(
+        UserModel.findByYoutubeID = jest.fn().mockReturnValue(
             Promise.resolve({
                 id: "foo",
                 twitchUser: new TwitchUser(0),
@@ -207,7 +207,7 @@ describe("handleCallback", () => {
         });
     
         test("Fails to query db", async() => {
-            UserModel.findUserByYoutubeID = jest.fn().mockReturnValueOnce(
+            UserModel.findByYoutubeID = jest.fn().mockReturnValueOnce(
                 Promise.reject(new Error("Failed to query db"))
             );
             const request : any = mockRequest({
@@ -220,7 +220,7 @@ describe("handleCallback", () => {
         });
     
         test("Does not find user", async() => {
-            UserModel.findUserByYoutubeID = jest.fn().mockReturnValueOnce(
+            UserModel.findByYoutubeID = jest.fn().mockReturnValueOnce(
                 Promise.resolve(null)
             );
             const request : any = mockRequest({

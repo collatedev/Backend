@@ -6,7 +6,7 @@ import IYoutubeVideoModel from "./IYoutubeVideoModel";
 const YoutubeVideoSchema : Schema = new Schema({
     channelID: String,
     datePublished: Date,
-    fromUserID: String,
+    userID: String,
     link: String,
     title: String,
     videoID: String,
@@ -14,7 +14,7 @@ const YoutubeVideoSchema : Schema = new Schema({
 
 YoutubeVideoSchema.methods.isDuplicate = async function() : Promise<boolean> {
     const currentContext : IYoutubeVideo = this as IYoutubeVideo;
-    const results : IYoutubeVideo[] = await currentContext.model('YoutubeCreateVideoNotification').find({
+    const results : IYoutubeVideo[] = await currentContext.model('YoutubeVideo').find({
         "videoID": currentContext.videoID
     }).exec() as IYoutubeVideo[];
     if (results.length === 0) {
@@ -31,6 +31,6 @@ YoutubeVideoSchema.statics.findByVideoID = async function(
 }; 
 
 export default Notification.discriminator<IYoutubeVideo>(
-    'YoutubeCreateVideoNotification', 
+    'YoutubeVideo', 
     YoutubeVideoSchema
 ) as IYoutubeVideoModel;

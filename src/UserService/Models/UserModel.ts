@@ -33,10 +33,17 @@ UserSchema.methods.addWebhook = async function(webhook : IWebhookInfo) : Promise
     }).exec();
 };
 
-UserSchema.statics.findUserByYoutubeID = async function(channelID : string) : Promise<IUser | null> {
+UserSchema.statics.findByYoutubeID = async function(channelID : string) : Promise<IUser | null> {
     const currentContext : IUserModel = this as IUserModel;
     return currentContext.findOne({
         "youtubeChannel.youtubeID": channelID
+    }).exec();
+};
+
+UserSchema.statics.findByTwitchID = async function(channelID : number) : Promise<IUser | null> {
+    const currentContext : IUserModel = this as IUserModel;
+    return currentContext.findOne({
+        "twitchUser.userID": channelID
     }).exec();
 };
 

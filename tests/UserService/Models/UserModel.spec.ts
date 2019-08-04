@@ -114,7 +114,7 @@ test("Should find a user by youtube id", async () => {
     const twitchUser : ITwitchUser = new TwitchUser(0);
     await (await createUser(twitchUser, channel)).save();
 
-    const user : IUser = await UserModel.findUserByYoutubeID("bar") as IUser;
+    const user : IUser = await UserModel.findByYoutubeID("bar") as IUser;
 
     expect(user).not.toBeNull();
     expect(user.twitchUser).toMatchObject({
@@ -128,9 +128,29 @@ test("Should find a user by youtube id", async () => {
 });
 
 test("Should not find a user by id", async () => {
-    const user : IUser | null = await UserModel.findUserByYoutubeID("bar");
+    expect(await UserModel.findByYoutubeID("bar")).toBeNull();
+});
 
-    expect(user).toBeNull();
+test("Should find a user by twitch id", async () => {
+    const channel : IYoutubeChannel = createYoutubeChannel("foo", "bar", "baz");
+    const twitchUser : ITwitchUser = new TwitchUser(0);
+    await (await createUser(twitchUser, channel)).save();
+
+    const user : IUser = await UserModel.findByTwitchID(0) as IUser;
+
+    expect(user).not.toBeNull();
+    expect(user.twitchUser).toMatchObject({
+        userID: 0
+    });
+    expect(user.youtubeChannel).toMatchObject({
+        channelName: "foo",
+        title: "baz",
+        youtubeID: "bar"
+    });
+});
+
+test("Should not find a user by id", async () => {
+    expect(await UserModel.findByTwitchID(0)).toBeNull();
 });
 
 
