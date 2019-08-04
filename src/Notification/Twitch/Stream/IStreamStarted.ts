@@ -1,12 +1,12 @@
-import { Document } from "mongoose";
+import INotification from "../../INotification";
 
-export default interface IStreamStarted extends Document {
+export default interface IStreamStarted extends INotification {
     streamID: number;
 	userID: string;
 	twitchUserName: string;
 	gameID: number;
 	communityIDs: number[];
-	type: string;
+	streamType: string;
 	title: string;
 	viewerCount: number;
 	startedAt: Date;

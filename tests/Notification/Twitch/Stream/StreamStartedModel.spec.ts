@@ -2,6 +2,7 @@ import IStreamStarted from "../../../../src/Notification/Twitch/Stream/IStreamSt
 import StreamStartedModel from "../../../../src/Notification/Twitch/Stream/StreamStartedModel";
 import StreamBody from "../../../../src/TwitchWatcher/RequestBody/request/StreamBody";
 import MockDB from "../../../mocks/MockDB";
+import NotificationType from "../../../../src/Notification/NotificationType";
 
 const db : MockDB = new MockDB();
 
@@ -45,7 +46,8 @@ test("It creates a stream started model from a stream data payload", () => {
     expect(streamStarted.thumbnailURL).toEqual("url");
     expect(streamStarted.title).toEqual("title");
     expect(streamStarted.twitchUserName).toEqual("foo");
-    expect(streamStarted.type).toEqual("bar");
+    expect(streamStarted.type).toEqual(NotificationType.Twitch.StreamStarted);
+    expect(streamStarted.streamType).toEqual("bar");
     expect(streamStarted.userID).toEqual("userID");
     expect(streamStarted.viewerCount).toEqual(0);
 });

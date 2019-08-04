@@ -4,6 +4,7 @@ import IStreamStarted from "./IStreamStarted";
 import IStreamStartedModel from "./IStreamStartedModel";
 import StreamBody from "../../../TwitchWatcher/RequestBody/request/StreamBody";
 import IUser from "../../../UserService/Models/IUser";
+import NotificationType from "../../NotificationType";
 
 const StreamStartedModel : Schema = new Schema({
     streamID: Number,
@@ -11,7 +12,7 @@ const StreamStartedModel : Schema = new Schema({
 	twitchUserName: String,
 	gameID: Number,
 	communityIDs: [Number],
-	type: String,
+	streamType: String,
 	title: String,
 	viewerCount: Number,
 	startedAt: Date,
@@ -27,7 +28,8 @@ StreamStartedModel.statics.createFromBody = function(streamBody :StreamBody, use
 		twitchUserName: streamBody.data[0].user_name,
 		gameID: streamBody.data[0].game_id,
 		communityIDs: streamBody.data[0].community_ids,
-		type: streamBody.data[0].type,
+		type: NotificationType.Twitch.StreamStarted,
+		streamType: streamBody.data[0].type,
 		title: streamBody.data[0].title,
 		viewerCount: streamBody.data[0].viewer_count,
 		startedAt: new Date(streamBody.data[0].started_at),
