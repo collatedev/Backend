@@ -42,7 +42,7 @@ export default abstract class TopicRouter extends Router implements ITopicRouter
 			}, StatusCodes.OK);
 		} catch (error) {
 			this.logger.error(error);
-			this.sendError(response, "Failed to process webhook data", StatusCodes.InternalError);
+			this.sendError(response, error, StatusCodes.InternalError);
 		}
 	}
 

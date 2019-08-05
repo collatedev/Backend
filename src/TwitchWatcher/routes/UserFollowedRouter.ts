@@ -2,6 +2,10 @@ import TopicRouter from "./TopicRouter";
 import UserFollowRequestSchema from "../RequestSchemas/UserFollowRequest.json";
 import ValidationSchema from "../../RequestValidator/ValidationSchema/ValidationSchema";
 import ILogger from "../../Logging/ILogger";
+import FollowBody from "../RequestBody/request/FollowBody";
+import UserModel from "../../UserService/Models/UserModel";
+import IUser from "../../UserService/Models/IUser";
+import FollowModel from "../../Notification/Twitch/Follow/FollowModel";
 
 export default class UserFollowedRouter extends TopicRouter {	
 	constructor(logger : ILogger) {
@@ -10,5 +14,12 @@ export default class UserFollowedRouter extends TopicRouter {
 
 	protected async handleWebhookData(rawBody: any): Promise<void> {
 		this.logger.info(`User Followed webhook recieved body: ${JSON.stringify(rawBody)}`);
+		const followData : FollowBody = new FollowBody(rawBody);		
+		const user : IUser | null = await UserModel.findByTwitchID(followData.data[0].from_id);
+		if (user === null) {
+			throw new Error(`Failed to find user with twitch id '${followData.data[0].from_id}'`);
+		}
+		await FollowModel.createFollowedNotification(followData, user).save();
+		this.logger.info('Saved user followed noticiation to database');
 	}
 }
