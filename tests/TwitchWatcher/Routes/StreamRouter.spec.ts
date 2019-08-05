@@ -91,30 +91,6 @@ describe("handleWebhookCall()", () => {
 				id: "foo",
 				twitchUser: {
 					userID: 0
-				},
-			})
-		);
-		const request : any = mockRequest({
-			body: streamStartedPayload()
-		});
-		const response : any = mockResponse();
-	
-		await Router.handleWebhookCall(request, response);
-
-		expect(response.status).toHaveBeenCalledWith(StatusCodes.OK);
-		expect(response.json).toHaveBeenCalledWith(new DataMessage({
-			desc: `Recieved data under topic: streams`,
-			body: request.body,
-			processedData: true,
-		}));
-	});
-
-	test('Should process data', async () => {
-		UserModel.findByTwitchID = jest.fn().mockReturnValue(
-			Promise.resolve({
-				id: "foo",
-				twitchUser: {
-					userID: 0
 				}
 			})
 		);
