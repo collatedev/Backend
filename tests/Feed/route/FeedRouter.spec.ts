@@ -28,8 +28,8 @@ afterEach(async () => {
 });
 
 test("Gets a feed for a user", async () => {
-    await createNotification(new Date("October 13, 2014 11:13:00"));
-    await createNotification(new Date("October 13, 2012 11:13:00"));
+    const document : any = getTestDocument(new Date("October 13, 2014 11:13:00"));
+    await createNotification(document);
     const request : any = mockRequest({
         params: {
             userID: "foo"
@@ -41,31 +41,93 @@ test("Gets a feed for a user", async () => {
     const response : any = MockResponse();
 
     await router.getFeed(request, response);
-    
-    expect(response.json).toHaveBeenCalledWith(new DataMessage([
-        {
-            type : NotificationType.Youtube.CreateVideo,
-            fromUserID : "userID",
-            createdAt : new Date("October 13, 2014 11:13:00"),
-            channelID: "channelID",
-            datePublished: new Date(0),
-            userID: "userID",
-            link: "link",
-            title: "title",
-            videoID: "videoID",
+
+    const payload : any = response.getJSON();
+    expect(payload).toBeInstanceOf(DataMessage);
+    expect(payload.data).toHaveLength(1);
+    expect(payload.data[0]).toMatchObject(document);
+    expect(response.json).toHaveBeenCalled();
+    expect(response.status).toHaveBeenCalledWith(StatusCodes.OK);
+});
+
+test("Gets a feed for a user with dates descending", async () => {
+    const document : any = getTestDocument(new Date("October 13, 2014 11:13:00"));
+    const resultSize : number = 2;
+    await createNotification(document);
+    await createNotification(getTestDocument(new Date("October 13, 1 11:13:00")));
+    const request : any = mockRequest({
+        params: {
+            userID: "foo"
         },
-        {
-            type : NotificationType.Youtube.CreateVideo,
-            fromUserID : "userID",
-            createdAt : new Date("October 13, 2012 11:13:00"),
-            channelID: "channelID",
-            datePublished: new Date(0),
-            userID: "userID",
-            link: "link",
-            title: "title",
-            videoID: "videoID",
+        query: {
+            offset: 0
         }
-    ]));
+    });
+    const response : any = MockResponse();
+
+    await router.getFeed(request, response);
+
+    const payload : any = response.getJSON();
+    expect(payload).toBeInstanceOf(DataMessage);
+    expect(payload.data).toHaveLength(resultSize);
+    expect(payload.data[0]).toMatchObject(document);
+    expect(response.json).toHaveBeenCalled();
+    expect(response.status).toHaveBeenCalledWith(StatusCodes.OK);
+});
+
+test("Gets a subset of the feed for a user", async () => {
+    const queryResultLimit : number = 20;
+    const testDocuments : number = 30;
+    const document : any = getTestDocument(new Date(`October 13, 29 11:13:00`));
+    for (let i : number = 0; i < testDocuments; i++) {
+        await createNotification(getTestDocument(new Date(`October 13, ${i} 11:13:00`)));
+    }
+
+    const request : any = mockRequest({
+        params: {
+            userID: "foo"
+        },
+        query: {
+            offset: 0
+        }
+    });
+    const response : any = MockResponse();
+
+    await router.getFeed(request, response);
+
+    const payload : any = response.getJSON();
+    expect(payload).toBeInstanceOf(DataMessage);
+    expect(payload.data).toHaveLength(queryResultLimit);
+    expect(payload.data[0]).toMatchObject(document);
+    expect(response.json).toHaveBeenCalled();
+    expect(response.status).toHaveBeenCalledWith(StatusCodes.OK);
+});
+
+test("Gets a subset of the feed for a user from an offset", async () => {
+    const queryResultLimit : number = 20;
+    const testDocuments : number = 30;
+    const document : any = getTestDocument(new Date(`October 13, 27 11:13:00`));
+    for (let i : number = 0; i < testDocuments; i++) {
+        await createNotification(getTestDocument(new Date(`October 13, ${i} 11:13:00`)));
+    }
+
+    const request : any = mockRequest({
+        params: {
+            userID: "foo"
+        },
+        query: {
+            offset: 2
+        }
+    });
+    const response : any = MockResponse();
+
+    await router.getFeed(request, response);
+
+    const payload : any = response.getJSON();
+    expect(payload).toBeInstanceOf(DataMessage);
+    expect(payload.data).toHaveLength(queryResultLimit);
+    expect(payload.data[0]).toMatchObject(document);
+    expect(response.json).toHaveBeenCalled();
     expect(response.status).toHaveBeenCalledWith(StatusCodes.OK);
 });
 
@@ -73,12 +135,10 @@ test("Fails to get a feed for a user", async () => {
     const prop : any = Notification.find;
     Notification.find = jest.fn().mockReturnValue({
         sort() : any {
-            throw new Error("Failed to query database")
+            throw new Error("Failed to query database");
         }
     });
 
-    await createNotification(new Date("October 13, 2014 11:13:00"));
-    await createNotification(new Date("October 13, 2012 11:13:00"));
     const request : any = mockRequest({
         params: {
             userID: "foo"
@@ -96,15 +156,20 @@ test("Fails to get a feed for a user", async () => {
     Notification.find = prop;
 });
 
-async function createNotification(date : Date) : Promise<INotification> {
-    return new YoutubeVideoModel({
+async function createNotification(document : any) : Promise<INotification> {
+    return new YoutubeVideoModel(document).save();
+}
+
+function getTestDocument(date : Date) : any {
+    return {
         createdAt: date,
         type: NotificationType.Youtube.CreateVideo,
         title: "title",
+        userID: "userID",
         videoID: "videoID",
         channelID: "channelID",
         datePublished: new Date(0),
         fromUserID: "fromUserID",
         link: "link"
-    }).save();
+    };
 }

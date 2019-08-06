@@ -6,5 +6,6 @@ export default class Message implements IMessage {
 	
 	constructor(success: boolean, data : any) {
 		this.success = success;
+		this.data = data;
 	}
 }

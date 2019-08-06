@@ -21,14 +21,15 @@ export default class FeedRouter extends Router {
 
     public async getFeed(request : Request, response : Response) : Promise<void> {
         try {
-            const feed : INotification[] = await Notification
+            let feed : INotification[] = await Notification
             .find()
             .sort({
                 createdAt: 'desc'
             })
-            .skip(request.query.offset)
+            .skip(parseInt(request.query.offset, 10))
             .limit(Limit)
             .exec();
+            feed = feed.map((notification : INotification) => notification.toJSON())
             this.sendData(response, feed, StatusCodes.OK);
         } catch (error) {
             this.sendError(response, error, StatusCodes.InternalError);

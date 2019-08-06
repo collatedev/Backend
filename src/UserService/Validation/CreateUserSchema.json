@@ -1,0 +1,24 @@
+{
+    "types": {
+        "request": {
+            "headers": {
+                "type": "any",
+                "required": false
+            },
+            "body": {
+                "type": "Body",
+                "required": true
+            }
+        },
+        "Body": {
+            "twitchUserName": {
+                "type": "string",
+                "required": false
+            },
+            "youtubeChannelname": {
+                "type": "string",
+                "required": false
+            }
+        }
+    }
+}
