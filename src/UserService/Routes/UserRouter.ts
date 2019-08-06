@@ -3,37 +3,10 @@ import GetUserRequestSchema from "../RequestSchemas/GetUserRequest.json";
 import IUserLayer from "../layers/IUserLayer";
 import Router from "../../Router/Router";
 import ILogger from "../../Logging/ILogger";
-import IValidationSchema from "../../RequestValidator/ValidationSchema/IValidationSchema";
 import ValidationSchema from "../../RequestValidator/ValidationSchema/ValidationSchema";
 import StatusCodes from "../../Router/StatusCodes";
 import IUser from "../Models/IUser";
-
-const InsecureSchema : IValidationSchema = new ValidationSchema({
-    "types": {
-        "request": {
-            "body": {
-                "required": false,
-                "type": "any"
-            },
-            "query": {
-                "required": false,
-                "type": "any"
-            },
-            "headers": {
-                "required": false,
-                "type": "any"
-            },
-            "cookies": {
-                "required": false,
-                "type": "any"
-            },
-            "params": {
-                "required": false,
-                "type": "any"
-            }
-        }
-    }
-});
+import CreateUserSchema from "../Validation/CreateUserSchema.json";
 
 export default class UserRouter extends Router {
 	private userLayer : IUserLayer;
@@ -47,7 +20,7 @@ export default class UserRouter extends Router {
 
 	public setup() : void {
 		this.get('/:userID', this.handleGetUserByID, new ValidationSchema(GetUserRequestSchema));
-		this.post('/', this.createUser, InsecureSchema);
+		this.post('/', this.createUser, new ValidationSchema(CreateUserSchema));
 	}
 
 	public async handleGetUserByID(request: Request, response: Response) : Promise<void> {

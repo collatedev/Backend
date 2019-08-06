@@ -103,7 +103,7 @@ describe("handleWebhookCall()", () => {
 
 		expect(response.status).toHaveBeenCalledWith(StatusCodes.OK);
 		expect(response.json).toHaveBeenCalledWith(new DataMessage({
-			desc: `Recieved data under topic: streams`,
+			desc: `Recieved data under topic: /streams`,
 			body: request.body,
 			processedData: true,
 		}));
@@ -129,7 +129,7 @@ describe("handleWebhookCall()", () => {
 
 		expect(response.status).toHaveBeenCalledWith(StatusCodes.OK);
 		expect(response.json).toHaveBeenCalledWith(new DataMessage({
-			desc: `Recieved data under topic: streams`,
+			desc: `Recieved data under topic: /streams`,
 			body: request.body,
 			processedData: true,
 		}));

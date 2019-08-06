@@ -1,0 +1,30 @@
+{
+    "types": {
+        "request": {
+            "headers": {
+                "type": "any",
+                "required": false
+            },
+            "query": {
+                "type": "Query",
+                "required": true
+            },
+            "params": {
+                "type": "Params",
+                "required": true
+            }
+        },
+        "Params": {
+            "userID": {
+                "type": "string",
+                "required": true
+            }
+        },
+        "Query": {
+            "offset": {
+                "type": "number",
+                "required": true
+            }
+        }
+    }
+}

@@ -104,7 +104,7 @@ describe("handleWebhookCall()", () => {
 
 		expect(response.status).toHaveBeenCalledWith(StatusCodes.OK);
 		expect(response.json).toHaveBeenCalledWith(new DataMessage({
-			desc: `Recieved data under topic: streams`,
+			desc: `Recieved data under topic: /follow/followed`,
 			body: request.body,
 			processedData: true,
 		}));

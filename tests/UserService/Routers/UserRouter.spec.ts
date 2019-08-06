@@ -100,10 +100,10 @@ describe('handleGetUserByID()', () => {
     test('Should get user data', async () => {
         const channel : IYoutubeChannel = createYoutubeChannel("foo", "bar", "baz");
         const twitchUser : ITwitchUser = new TwitchUser(1);
-        UserLayer.prototype.getUserInfo = jest.fn().mockReturnValue(
-            Promise.resolve(createUser(twitchUser, channel))
-        );
         const user : IUser = createUser(twitchUser, channel);
+        UserLayer.prototype.getUserInfo = jest.fn().mockReturnValue(
+            Promise.resolve(user)
+        );
         const request : any = mockRequest({
             params: {
                 userID: user.id
@@ -114,7 +114,7 @@ describe('handleGetUserByID()', () => {
         await router.handleGetUserByID(request, response);
 
         expect(response.status).toHaveBeenCalledWith(StatusCodes.OK);
-        expect(response.json).toHaveBeenCalledWith(new DataMessage(user.toJSON()));
+        expect(response.json).toHaveBeenCalledWith(new DataMessage(user.toObject()));
     });
 });
 
